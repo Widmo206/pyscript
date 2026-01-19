@@ -1,0 +1,5 @@
+hello()
+
+print("text")
+print(1234)
+exit()

@@ -8,7 +8,7 @@ Contributors:
 
 from typing import Callable, Type, Any
 from dataclasses import dataclass
-from string import ascii_letters, digits
+from string import ascii_letters, digits, whitespace
 from enum import Enum
 import logging
 
@@ -141,7 +141,12 @@ class Parser(object):
             current_token = ""
             char = self.file[c]
 
-            if char in ascii_letters:
+            if char in whitespace:
+                logger.debug(f"Found whitespace at {c}")
+                c += 1
+                continue
+
+            elif char in ascii_letters:
                 logger.debug(f"Found token KEYWORD or REFERENCE at {c}")
                 i = 0
                 while char in ascii_letters:

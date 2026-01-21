@@ -45,7 +45,10 @@ class TokenType(Enum):
     DASH        = 11
     STAR        = 12
     SLASH       = 13
-    POWER       = 14
+
+
+def log_token(token_type: TokenType, char: int) -> None:
+    logger.debug(f"Found token {token_type._name_} at {char}")
 
 
 @dataclass
@@ -134,7 +137,7 @@ class Parser(object):
         current_token = ""
         token_type = TokenType.NOP
 
-        logger.info(f"START parsing {self.path}")
+        logger.info(f"Start tokenizing {self.path}")
 
         c = 0
         while c < len(self.file):
@@ -147,7 +150,6 @@ class Parser(object):
                 continue
 
             elif char in ascii_letters:
-                logger.debug(f"Found token KEYWORD or REFERENCE at {c}")
                 i = 0
                 while char in ascii_letters:
                     # get the rest of the token
@@ -156,14 +158,15 @@ class Parser(object):
                     char = self.file[c + i]
                 if current_token in KEYWORDS:
                     token_type = TokenType.KEYWORD
+                    log_token(TokenType.KEYWORD, c)
                 else:
                     token_type = TokenType.REFERENCE
+                    log_token(TokenType.REFERENCE, c)
                 tokens.append(Token(token_type, current_token))
                 c += i
                 continue
 
             elif char in digits:
-                logger.debug(f"Found token INT_LIT at {c}")
                 # TODO: handle floats
                 i = 0
                 while char in digits:
@@ -172,11 +175,11 @@ class Parser(object):
                     i += 1
                     char = self.file[c + i]
                 tokens.append(Token(TokenType.INT_LIT, int(current_token)))
+                log_token(TokenType.INT_LIT, c)
                 c += i
                 continue
 
             elif char in QUOTES:
-                logger.debug(f"Found token STRING_LIT at {c}")
                 start_quote = char
                 for i in range(c+1, len(self.file)-1):
                     char = self.file[i]
@@ -198,29 +201,60 @@ class Parser(object):
                     else:
                         current_token += char
                 tokens.append(Token(TokenType.STRING_LIT, current_token))
+                log_token(TokenType.STRING_LIT, c)
                 continue
 
             elif char == "(":
-                logger.debug(f"Found token OPEN_PAREN at {c}")
+                log_token(TokenType.OPEN_PAREN, c)
                 tokens.append(Token(TokenType.OPEN_PAREN, None))
                 c += 1
                 continue
 
             elif char == ")":
-                logger.debug(f"Found token CLOSE_PAREN at {c}")
+                log_token(TokenType.CLOSE_PAREN, c)
                 tokens.append(Token(TokenType.CLOSE_PAREN, None))
                 c += 1
                 continue
 
             elif char == "\n":
-                logger.debug(f"Found token NEWLINE at {c}")
+                log_token(TokenType.NEWLINE, c)
                 tokens.append(Token(TokenType.NEWLINE, None))
+                c += 1
+                continue
+            
+            elif char == "+":
+                log_token(TokenType.PLUS, c)
+                tokens.append(Token(TokenType.PLUS, None))
+                c += 1
+                continue
+            
+            elif char == "-":
+                log_token(TokenType.DASH, c)
+                tokens.append(Token(TokenType.DASH, None))
+                c += 1
+                continue
+            
+            elif char == "*":
+                log_token(TokenType.STAR, c)
+                tokens.append(Token(TokenType.STAR, None))
+                c += 1
+                continue
+            
+            elif char == "/":
+                log_token(TokenType.SLASH, c)
+                tokens.append(Token(TokenType.SLASH, None))
+                c += 1
+                continue
+            
+            elif char == ",":
+                log_token(TokenType.COMMA, c)
+                tokens.append(Token(TokenType.COMMA, None))
                 c += 1
                 continue
 
             else:
                 raise UnknownTokenError(f"There are no tokens that start with '{char}' (character no. {c} in {self.path})")
-
+        logger.info(f"Finished tokenizing {self.path} into {len(tokens)} tokens")
         return tokens
 
 

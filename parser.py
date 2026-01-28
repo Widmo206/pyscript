@@ -17,7 +17,10 @@ logger = logging.getLogger(__name__)
 ESCAPE_CHAR = "\\"
 QUOTES = "\"'"
 KEYWORDS = (
+    "const",
+    "var",
     "return",
+    "exit",
     )
 
 
@@ -37,14 +40,15 @@ class TokenType(Enum):
     OPEN_PAREN  = 3
     CLOSE_PAREN = 4
     SEMICOLON   = 5
-    STRING_LIT  = 6
-    INT_LIT     = 7
-    FLOAT_LIT   = 8
-    COMMA       = 9
-    PLUS        = 10
-    DASH        = 11
-    STAR        = 12
-    SLASH       = 13
+    ASSIGN      = 6
+    STRING_LIT  = 7
+    INT_LIT     = 8
+    FLOAT_LIT   = 9
+    COMMA       = 10
+    PLUS        = 11
+    DASH        = 12
+    STAR        = 13
+    SLASH       = 14
 
 
 def log_token(token_type: TokenType, char: int) -> None:
@@ -218,7 +222,8 @@ class Parser(object):
                 for i in range(c+1, len(self.file)-1):
                     char = self.file[i]
                     if char == start_quote:
-                        logger.debug("Found endquote")
+                        # logger.debug("Found endquote")
+                        # TODO: Rework handling of escape characters
                         escaped = False
                         for j in range(i-1, c+1, -1):
                             if self.file[j] == ESCAPE_CHAR:
@@ -226,16 +231,22 @@ class Parser(object):
                             else:
                                 break
                         if escaped:
-                            logger.debug("Quote escaped")
+                            # logger.debug("Quote escaped")
                             current_token += char
                         else:
-                            logger.debug(f"length of str is {i - c - 1}")
+                            # logger.debug(f"length of str is {i - c - 1}")
                             c = i + 1
                             break
                     else:
                         current_token += char
                 tokens.append(Token(TokenType.STRING_LIT, current_token))
                 log_token(TokenType.STRING_LIT, c)
+                continue
+
+            elif char == "=":
+                log_token(TokenType.ASSIGN, c)
+                tokens.append(Token(TokenType.ASSIGN, None))
+                c += 1
                 continue
 
             elif char == "(":

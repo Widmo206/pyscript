@@ -9,7 +9,7 @@ Contributors:
 from typing import Callable, Type, Any
 from dataclasses import dataclass
 from string import ascii_letters, digits, whitespace
-from enum import Enum
+from enum import auto, Enum
 import logging
 
 
@@ -34,21 +34,21 @@ def hello_world() -> None:
 
 
 class TokenType(Enum):
-    NOP         = 0
-    KEYWORD     = 1
-    REFERENCE   = 2
-    OPEN_PAREN  = 3
-    CLOSE_PAREN = 4
-    SEMICOLON   = 5
-    ASSIGN      = 6
-    STRING_LIT  = 7
-    INT_LIT     = 8
-    FLOAT_LIT   = 9
-    COMMA       = 10
-    PLUS        = 11
-    DASH        = 12
-    STAR        = 13
-    SLASH       = 14
+    NOP         = auto()
+    KEYWORD     = auto()
+    REFERENCE   = auto()
+    OPEN_PAREN  = auto()
+    CLOSE_PAREN = auto()
+    SEMICOLON   = auto()
+    ASSIGN      = auto()
+    STRING_LIT  = auto()
+    INT_LIT     = auto()
+    FLOAT_LIT   = auto()
+    COMMA       = auto()
+    PLUS        = auto()
+    DASH        = auto()
+    STAR        = auto()
+    SLASH       = auto()
 
 
 def log_token(token_type: TokenType, char: int) -> None:

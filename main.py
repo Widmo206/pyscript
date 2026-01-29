@@ -19,6 +19,7 @@ def main() -> None:
     root.attributes("-fullscreen", True)
 
     style = ttk.Style()
+    print(style.colors)
 
     main_frame = ttk.Frame(root)
     main_frame.pack(anchor=CENTER, fill=BOTH, expand=True)
@@ -35,7 +36,7 @@ def main() -> None:
     editor = Editor(paned_window)
     paned_window.add(editor.frame)
 
-    tilemap = Tilemap(paned_window, 16, 16)
+    tilemap = Tilemap(paned_window, 16, 9)
     paned_window.add(tilemap.frame)
 
     root.mainloop()

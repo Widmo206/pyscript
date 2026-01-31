@@ -11,6 +11,7 @@ import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
 from editor import Editor
+from level import Level
 from tilemap import Tilemap
 
 
@@ -35,7 +36,7 @@ def main() -> None:
     editor = Editor(paned_window)
     paned_window.add(editor.frame)
 
-    tilemap = Tilemap(paned_window, 7, 7)
+    tilemap = Tilemap(paned_window, Level.from_path(Level.PATHS[0]).tilemap_layout)
     paned_window.add(tilemap.frame)
 
     root.mainloop()

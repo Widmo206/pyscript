@@ -1,0 +1,7 @@
+name: "Tutorial"
+tilemap_layout: |-
+    G
+    O
+    P
+pyscript: |
+  print("Welcome to the game!")

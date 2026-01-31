@@ -5,13 +5,13 @@ Contributors:
     Widmo
 """
 
-
-from typing import Callable, Type, Any
 from dataclasses import dataclass
-from string import ascii_letters, digits, whitespace
 import logging
-from enums import TokenType
+from string import ascii_letters, digits, whitespace
+from typing import Callable, Type, Any
 
+from enums import TokenType
+from errors import UnknownTokenError
 
 logger = logging.getLogger(__name__)
 ESCAPE_CHAR = "\\"
@@ -22,11 +22,6 @@ KEYWORDS = (
     "return",
     "exit",
     )
-
-
-class UnknownTokenError(ValueError):
-    """Raised when the Parser finds a token that is broken or doesn't exist."""
-    pass
 
 
 def hello_world() -> None:

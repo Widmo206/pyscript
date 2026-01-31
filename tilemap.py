@@ -6,25 +6,34 @@ Contributors:
 """
 
 from dataclasses import dataclass
+from math import floor
 import tkinter as tk
 
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
-from math import floor
+from enums import TileType
 from tile import Tile
 
 
 @dataclass
 class Tilemap:
     master: tk.Misc
-    width: int = 16
-    height: int = 16
+    layout: str
     padding: int = 32
 
     def __post_init__(self) -> None:
+        if self.layout == "":
+            raise ValueError("Tilemap layout cannot be empty")
+
+        rows = self.layout.splitlines()
+        self.width = len(rows[0])
+        self.height = len(rows)
+
+        if any(len(row) != self.width for row in rows):
+            raise ValueError(f"Mismatched row length in tilemap layout '{layout}'")
         if self.width < 1 or self.height < 1:
-            raise ValueError("Grid dimensions cannot be less than 1x1")
+            raise ValueError(f"Grid dimensions ({self.width}x{self.height}) cannot be less than 1x1")
 
         self.frame = ttk.Frame(self.master, padding=self.padding)
         self.frame.columnconfigure(0, weight=1)
@@ -38,7 +47,7 @@ class Tilemap:
         self.tiles = []
         for x in range(self.width):
             for y in range(self.height):
-                tile = Tile(self.grid_frame)
+                tile = Tile(self.grid_frame, rows[y][x])
                 tile.label.grid(column=x, row=y)
                 self.tiles.append(tile)
 

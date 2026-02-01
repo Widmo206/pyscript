@@ -18,7 +18,6 @@ from menu_bar import MenuBar
 
 def main() -> None:
     root = ttk.Window(themename="darkly")
-    root.attributes("-fullscreen", True)
 
     style = ttk.Style()
 

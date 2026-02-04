@@ -26,7 +26,7 @@ class Level:
 
     @classmethod
     def from_path(cls, path: Path) -> Level:
-        with open(path) as file:
+        with open(path, "r", encoding="utf-8") as file:
             try:
                 return cls(**yaml.safe_load(file))
             except yaml.parser.ParserError as e:

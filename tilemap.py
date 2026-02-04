@@ -10,9 +10,7 @@ from math import floor
 import tkinter as tk
 
 import ttkbootstrap as ttk
-import ttkbootstrap.constants as ttkc
 
-from enums import TileType
 from tile import Tile
 
 
@@ -31,7 +29,7 @@ class Tilemap:
         self.height = len(rows)
 
         if any(len(row) != self.width for row in rows):
-            raise ValueError(f"Mismatched row length in tilemap layout '{layout}'")
+            raise ValueError(f"Mismatched row length in tilemap layout '{self.layout}'")
         if self.width < 1 or self.height < 1:
             raise ValueError(f"Grid dimensions ({self.width}x{self.height}) cannot be less than 1x1")
 

@@ -4,4 +4,4 @@ tilemap_layout: |-
     O
     P
 pyscript: |
-  print("Welcome to the game!")
+  hello_world()

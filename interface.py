@@ -22,7 +22,7 @@ class Interface:
     def __init__(self) -> None:
         self.root = ttk.Window(title="PyScript", themename="darkly")
 
-        self.style = ttk.Style()
+        self.root.style.colors.set("primary", "#191919")
 
         self.main_frame = ttk.Frame(self.root)
         self.main_frame.columnconfigure(0, weight=1)
@@ -37,6 +37,7 @@ class Interface:
         self.margin_frame.columnconfigure(1, weight=1)
         self.margin_frame.columnconfigure(2, minsize=8)
         self.margin_frame.rowconfigure(0, weight=1)
+        self.margin_frame.rowconfigure(2, minsize=8)
         self.margin_frame.grid(column=0, row=1, sticky=ttkc.NSEW)
 
         self.paned_window = tk.PanedWindow(
@@ -44,11 +45,11 @@ class Interface:
             orient=ttkc.HORIZONTAL,
             sashwidth=8,
             borderwidth=0,
-            bg=self.style.colors.dark,
+            bg=self.root.style.colors.dark,
         )
         self.paned_window.grid(column=1, row=0, sticky=ttkc.NSEW)
 
-        self.editor = Editor(self.paned_window)
+        self.editor = Editor(self.paned_window, style=self.root.style)
         self.paned_window.add(self.editor.frame)
 
         self.level_frame = ttk.Frame(self.paned_window)

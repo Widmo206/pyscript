@@ -1,0 +1,9 @@
+name: "Test"
+tilemap_layout: |-
+    GOOOO
+    XXXXO
+    OOOXO
+    OXOXO
+    PXOOO
+pyscript: |
+  print("Welcome to the game!")

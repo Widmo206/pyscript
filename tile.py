@@ -5,7 +5,6 @@ Contributors:
     Romcode
 """
 
-from dataclasses import dataclass
 from PIL import ImageTk, Image
 import tkinter as tk
 
@@ -16,30 +15,36 @@ from enums import TileType
 from errors import UnknownTileTypeError
 
 
-@dataclass
 class Tile:
-    master: tk.Misc
-    tile_type: TileType | str = TileType.EMPTY
-    padding_ratio: float = 0.05
+    MIN_SIZE = 32
+    PADDING_RATIO = 0.05
 
-    def __post_init__(self) -> None:
-        if isinstance(self.tile_type, str):
+    def __init__(
+        self,
+        master: tk.Misc,
+        tile_type: TileType | str = TileType.EMPTY,
+    ) -> None:
+        if isinstance(tile_type, str):
             try:
-                self.tile_type = TileType(self.tile_type)
+                self.tile_type = TileType(tile_type)
             except ValueError as e:
                 raise UnknownTileTypeError(
                     f"No tile type matching character: '{self.tile_type}'"
                 ) from e
+        else:
+            self.tile_type = tile_type
 
         self.image_tk = ImageTk.PhotoImage(self.tile_type.image) if self.tile_type.image else None
-        self.label = ttk.Label(self.master, image=self.image_tk, borderwidth=0)
+        self.label = ttk.Label(master, image=self.image_tk, borderwidth=0)
 
     def resize(self, tile_size: int) -> None:
+        tile_size = max(tile_size, self.MIN_SIZE)
+
         if tile_size < 1:
             raise ValueError(f"Tile size ({tile_size}) cannot be less than 1")
 
-        image_size = round(tile_size * (1 - self.padding_ratio))
-        pad_size = round(tile_size * self.padding_ratio / 2)
+        image_size = round(tile_size * (1 - self.PADDING_RATIO))
+        pad_size = round(tile_size * self.PADDING_RATIO / 2)
         self.image_tk = ImageTk.PhotoImage(self.tile_type.image.resize(
             (image_size, image_size),
             Image.LANCZOS,

@@ -1,6 +1,6 @@
-"""MenuBar class to manage pyscript files and select levels
+"""LevelBar class to start levels and go through pyscript steps
 
-Created on 2026.02.01
+Created on 2026.02.04
 Contributors:
     Romcode
 """
@@ -11,7 +11,7 @@ import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
 
-class MenuBar:
+class LevelBar:
     def __init__(self, master: tk.Misc) -> None:
         self.frame = ttk.Frame(master, bootstyle=ttkc.DARK)
 

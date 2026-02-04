@@ -17,6 +17,7 @@ from errors import LevelParserError
 @dataclass
 class Level:
     PATHS = (
+        Path("levels/test.yaml"),
         Path("levels/tutorial.yaml"),
     )
 

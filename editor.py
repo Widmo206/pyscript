@@ -5,19 +5,15 @@ Contributors:
     Romcode
 """
 
-from dataclasses import dataclass
 import tkinter as tk
 
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
 
-@dataclass
 class Editor:
-    master: tk.Misc
-
-    def __post_init__(self) -> None:
-        self.frame = ttk.Frame(self.master)
+    def __init__(self, master: tk.Misc) -> None:
+        self.frame = ttk.Frame(master)
 
         self.text = ttk.Text(self.frame, wrap=ttkc.NONE)
         self.text.pack(side=ttkc.LEFT, fill=ttkc.BOTH, expand=True)

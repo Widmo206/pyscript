@@ -5,7 +5,6 @@ Contributors:
     Romcode
 """
 
-from dataclasses import dataclass
 from math import floor
 import tkinter as tk
 
@@ -14,15 +13,18 @@ import ttkbootstrap as ttk
 from tile import Tile
 
 
-@dataclass
 class Tilemap:
-    master: tk.Misc
-    layout: str
-    padding: int = 64
+    PADDING = 64
 
-    def __post_init__(self) -> None:
-        if self.layout == "":
+    def __init__(
+        self,
+        master: tk.Misc,
+        layout: str,
+    ) -> None:
+        if layout == "":
             raise ValueError("Tilemap layout cannot be empty")
+
+        self.layout = layout
 
         rows = self.layout.splitlines()
         self.width = len(rows[0])
@@ -33,7 +35,7 @@ class Tilemap:
         if self.width < 1 or self.height < 1:
             raise ValueError(f"Grid dimensions ({self.width}x{self.height}) cannot be less than 1x1")
 
-        self.frame = ttk.Frame(self.master, padding=self.padding)
+        self.frame = ttk.Frame(master, padding=self.PADDING)
         self.frame.columnconfigure(0, weight=1)
         self.frame.rowconfigure(0, weight=1)
         
@@ -51,8 +53,8 @@ class Tilemap:
 
     def update_tile_size(self) -> None:
         tile_size = floor(min(
-            (self.frame.winfo_width() - self.padding * 2) / self.width,
-            (self.frame.winfo_height() - self.padding * 2) / self.height,
+            (self.frame.winfo_width() - self.PADDING * 2) / self.width,
+            (self.frame.winfo_height() - self.PADDING * 2) / self.height,
         ))
 
         for tile in self.tiles:

@@ -284,7 +284,7 @@ if __name__ == "__main__":
     # clear the log file (doesn't happen otherwise, idk why)
     with open("latest.log", "wt") as _:
         pass
-    logging.basicConfig(filename='latest.log', level=logging.DEBUG)
+    logging.basicConfig(filename='latest.log', level=logging.DEBUG, format="%(asctime)s.%(msecs)03d | %(levelname)-5s | %(name)-10s | %(message)s", datefmt='%Y.%m.%d %H:%M:%S')
 
     fh = FunctionHolder()
 

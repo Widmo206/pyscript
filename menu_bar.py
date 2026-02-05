@@ -11,11 +11,12 @@ import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
 
-class MenuBar:
-    def __init__(self, master: tk.Misc) -> None:
-        self.frame = ttk.Frame(master, bootstyle=ttkc.DARK)
+class MenuBar(ttk.Frame):
+    def __init__(self, master: tk.Misc, **kwargs) -> None:
+        kwargs["bootstyle"] = ttkc.DARK
+        super().__init__(master, **kwargs)
 
-        self.file_menu_button = ttk.Menubutton(self.frame, text="File", bootstyle=ttkc.DARK)
+        self.file_menu_button = ttk.Menubutton(self, text="File", bootstyle=ttkc.DARK)
         self.file_menu_button.grid(column=0, row=0)
 
         self.file_menu = tk.Menu(self.file_menu_button)
@@ -27,5 +28,5 @@ class MenuBar:
         self.file_menu.add_command(label="Exit", command=None)
         self.file_menu_button["menu"] = self.file_menu
 
-        self.edit_menu_button = ttk.Menubutton(self.frame, text="Edit", bootstyle=ttkc.DARK)
+        self.edit_menu_button = ttk.Menubutton(self, text="Edit", bootstyle=ttkc.DARK)
         self.edit_menu_button.grid(column=1, row=0)

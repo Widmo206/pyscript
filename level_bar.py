@@ -13,16 +13,18 @@ import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
 
-class LevelBar:
-    def __init__(self, master: tk.Misc) -> None:
-        self.frame = ttk.Frame(master, bootstyle=ttkc.DARK)
-        self.frame.columnconfigure(1, weight=1)
-        self.frame.columnconfigure(5, weight=1)
-        self.frame.rowconfigure(0, minsize=8)
+class LevelBar(ttk.Frame):
+    def __init__(self, master: tk.Misc, **kwargs) -> None:
+        kwargs["bootstyle"] = ttkc.DARK
+        super().__init__(master, **kwargs)
+
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(5, weight=1)
+        self.rowconfigure(0, minsize=8)
 
         self.restart_image_tk = ImageTk.PhotoImage(Image.open(Path("sprites/restart.png")))
         self.restart_button = ttk.Button(
-            self.frame,
+            self,
             image=self.restart_image_tk,
             bootstyle=ttkc.DARK,
         )
@@ -30,7 +32,7 @@ class LevelBar:
 
         self.back_image_tk = ImageTk.PhotoImage(Image.open(Path("sprites/back.png")))
         self.back_button = ttk.Button(
-            self.frame,
+            self,
             image=self.back_image_tk,
             bootstyle=ttkc.DARK,
         )
@@ -39,7 +41,7 @@ class LevelBar:
         self.play_image_tk = ImageTk.PhotoImage(Image.open(Path("sprites/play.png")))
         self.pause_image_tk = ImageTk.PhotoImage(Image.open(Path("sprites/pause.png")))
         self.play_button = ttk.Button(
-            self.frame,
+            self,
             image=self.play_image_tk,
             bootstyle=ttkc.DARK,
         )
@@ -47,7 +49,7 @@ class LevelBar:
 
         self.forward_image_tk = ImageTk.PhotoImage(Image.open(Path("sprites/forward.png")))
         self.forward_button = ttk.Button(
-            self.frame,
+            self,
             image=self.forward_image_tk,
             bootstyle=ttkc.DARK,
         )
@@ -55,7 +57,7 @@ class LevelBar:
         
         self.level_select_image_tk = ImageTk.PhotoImage(Image.open(Path("sprites/level_select.png")))
         self.level_select_button = ttk.Button(
-            self.frame,
+            self,
             image=self.level_select_image_tk,
             bootstyle=ttkc.DARK,
         )

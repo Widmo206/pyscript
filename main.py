@@ -10,7 +10,7 @@ from interface import Interface
 
 def main() -> None:
     interface = Interface()
-    interface.root.mainloop()
+    interface.mainloop()
 
 
 if __name__ == "__main__":

@@ -12,11 +12,11 @@ import ttkbootstrap.constants as ttkc
 from ttkbootstrap.widgets.scrolled import ScrolledText
 
 
-class Editor:
-    def __init__(self, master: tk.Misc, style: ttk.Style) -> None:
-        self.frame = ttk.Frame(master)
+class Editor(ttk.Frame):
+    def __init__(self, master: tk.Misc, style: ttk.Style, **kwargs) -> None:
+        super().__init__(master, **kwargs)
 
-        self.line_text = tk.Text(self.frame)
+        self.line_text = tk.Text(self)
         self.line_text.config(
             width=4,
             padx=8,
@@ -29,7 +29,7 @@ class Editor:
         self.line_text.tag_config("active_line", foreground=style.colors.info)
         self.line_text.pack(side=ttkc.LEFT, fill=ttkc.Y)
 
-        self.scrolled_text = ScrolledText(self.frame, hbar=True, autohide=True, padding=0)
+        self.scrolled_text = ScrolledText(self, hbar=True, autohide=True, padding=0)
         self.scrolled_text.pack(side=ttkc.LEFT, fill=ttkc.BOTH, expand=True)
 
         self.text = self.scrolled_text.text

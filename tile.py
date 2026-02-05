@@ -15,7 +15,7 @@ from enums import TileType
 from errors import UnknownTileTypeError
 
 
-class Tile:
+class Tile(ttk.Label):
     MIN_SIZE = 32
     PADDING_RATIO = 0.05
 
@@ -23,6 +23,7 @@ class Tile:
         self,
         master: tk.Misc,
         tile_type: TileType | str = TileType.EMPTY,
+        **kwargs,
     ) -> None:
         if isinstance(tile_type, str):
             try:
@@ -35,7 +36,10 @@ class Tile:
             self.tile_type = tile_type
 
         self.image_tk = ImageTk.PhotoImage(self.tile_type.image) if self.tile_type.image else None
-        self.label = ttk.Label(master, image=self.image_tk, borderwidth=0)
+
+        kwargs["image"] = self.image_tk
+        kwargs["borderwidth"] = 0
+        super().__init__(master, **kwargs)
 
     def resize(self, tile_size: int) -> None:
         tile_size = max(tile_size, self.MIN_SIZE)
@@ -49,4 +53,4 @@ class Tile:
             (image_size, image_size),
             Image.LANCZOS,
         )) if self.tile_type.image else None
-        self.label.configure(image=self.image_tk, padding=pad_size)
+        self.configure(image=self.image_tk, padding=pad_size)

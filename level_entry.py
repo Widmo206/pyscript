@@ -54,8 +54,10 @@ class LevelEntry(ttk.Frame):
         )
         self.name_label.grid(column=2, row=0, sticky=tk.NSEW)
 
-        self.bind("<Enter>", self._on_enter)
-        self.bind("<Leave>", self._on_leave)
+        self.number_label.bind("<Enter>", self._on_enter)
+        self.number_label.bind("<Leave>", self._on_leave)
+        self.name_label.bind("<Enter>", self._on_enter)
+        self.name_label.bind("<Leave>", self._on_leave)
         bind_recursive(self,"<Button-1>", self._on_clicked)
 
     def _on_enter(self, _event: tk.Event) -> None:

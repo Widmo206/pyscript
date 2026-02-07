@@ -54,8 +54,17 @@ class LevelEntry(ttk.Frame):
         )
         self.name_label.grid(column=2, row=0, sticky=tk.NSEW)
 
+        self.bind("<Enter>", self._on_enter)
+        self.bind("<Leave>", self._on_leave)
         bind_recursive(self,"<Button-1>", self._on_clicked)
+
+    def _on_enter(self, _event: tk.Event) -> None:
+        self.number_label.config(bootstyle=(ttkc.SECONDARY, ttkc.INVERSE))
+        self.name_label.config(bootstyle=(ttkc.SECONDARY, ttkc.INVERSE))
+
+    def _on_leave(self, _event: tk.Event) -> None:
+        self.number_label.config(bootstyle=(ttkc.PRIMARY, ttkc.INVERSE))
+        self.name_label.config(bootstyle=(ttkc.PRIMARY, ttkc.INVERSE))
 
     def _on_clicked(self, _event: tk.Event) -> None:
         self.event_generate("<<Clicked>>")
-

@@ -27,6 +27,7 @@ class LevelManager(ttk.Frame):
     def open_level(self, level_path: Path) -> None:
         if self.level_select is not None:
             self.level_select.pack_forget()
+            self.level_select = None
 
         self.level_player = LevelPlayer(self, level_path)
         self.level_player.pack(anchor=ttkc.CENTER, fill=ttkc.BOTH, expand=True)
@@ -35,6 +36,7 @@ class LevelManager(ttk.Frame):
     def open_level_select(self) -> None:
         if self.level_player is not None:
             self.level_player.pack_forget()
+            self.level_player = None
 
         self.level_select = LevelSelect(self)
         self.level_select.pack(anchor=ttkc.CENTER, fill=ttkc.BOTH, expand=True)

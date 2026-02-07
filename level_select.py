@@ -5,6 +5,7 @@ Contributors:
     Romcode
 """
 
+from pathlib import Path
 import tkinter as tk
 
 import ttkbootstrap as ttk
@@ -28,10 +29,22 @@ class LevelSelect(ScrolledFrame):
 
         self.columnconfigure(0, weight=1)
 
+        # This is very ugly but tk events don't allow passing non str data
+        self.selected_level_number: int | None = None
+        self.selected_level_path: Path | None = None
+
         for i, level_path in enumerate(Level.PATHS * 50):
             level_entry = LevelEntry(self, i + 1, level_path)
-            level_entry.bind("<Button-1>", lambda _: print(i, level_path))
+            level_entry.bind("<<Clicked>>", self._on_level_entry_clicked)
             level_entry.grid(row=i * 2, column=0, sticky=tk.EW)
 
             if i < len(Level.PATHS * 50) - 1:
                 self.rowconfigure(i * 2 + 1, minsize=separation)
+
+    def _on_level_entry_clicked(self, event: tk.Event) -> None:
+        level_entry: LevelEntry = event.widget
+
+        self.selected_level_number = level_entry.level_number
+        self.selected_level_path = level_entry.level_path
+
+        self.event_generate("<<LevelSelected>>")

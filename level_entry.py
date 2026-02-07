@@ -11,6 +11,7 @@ import tkinter as tk
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
+from common import bind_recursive
 from level import Level
 
 
@@ -30,12 +31,12 @@ class LevelEntry(ttk.Frame):
         self.columnconfigure(2, weight=1)
         self.rowconfigure(0, weight=1)
 
+        self.level_number = level_number
         self.level_path = level_path
-        level = Level.from_path(self.level_path)
 
         self.number_label = ttk.Label(
             self,
-            text=str(level_number),
+            text=str(self.level_number),
             width=number_label_width,
             anchor=ttkc.CENTER,
             font=("Segoe UI", 16),
@@ -46,9 +47,15 @@ class LevelEntry(ttk.Frame):
 
         self.name_label = ttk.Label(
             self,
-            text=level.name,
+            text=Level.from_path(self.level_path).name,
             font=("Segoe UI", 16),
             padding=16,
             bootstyle=(ttkc.PRIMARY, ttkc.INVERSE),
         )
         self.name_label.grid(column=2, row=0, sticky=tk.NSEW)
+
+        bind_recursive(self,"<Button-1>", self._on_clicked)
+
+    def _on_clicked(self, _event: tk.Event) -> None:
+        self.event_generate("<<Clicked>>")
+

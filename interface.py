@@ -12,9 +12,9 @@ import tkinter as tk
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
-from editor import Editor
 from level_manager import LevelManager
 from menu_bar import MenuBar
+from pyscript_manager import PyscriptManager
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +56,8 @@ class Interface(ttk.Window):
         )
         self.paned_window.grid(column=1, row=0, sticky=ttkc.NSEW)
 
-        self.editor = Editor(self.paned_window, style=self.style)
-        self.paned_window.add(self.editor)
+        self.pyscript_manager = PyscriptManager(self.paned_window, self.style)
+        self.paned_window.add(self.pyscript_manager)
 
         self.level_manager = LevelManager(self.paned_window)
         self.paned_window.add(self.level_manager)
@@ -80,9 +80,9 @@ class Interface(ttk.Window):
         pyscript_path = self.level_manager.level_player.level.pyscript_path
         if pyscript_path is None:
             logger.warning(f"Loaded level has no initial PyScript")
-            self.editor.clear()
+            self.pyscript_manager.pyscript_editor.clear()
         else:
-            self.editor.open_pyscript(pyscript_path)
+            self.pyscript_manager.pyscript_editor.open_pyscript(pyscript_path)
 
     def _on_level_manager_level_select_opened(self, _event: tk.Event) -> None:
-        self.editor.open_pyscript(Path("pyscript/level_select.pyscript"))
+        self.pyscript_manager.pyscript_editor.open_pyscript(Path("pyscript/level_select.pyscript"))

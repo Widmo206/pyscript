@@ -1,4 +1,4 @@
-"""Editor class for writing pyscript in tkinter
+"""PyscriptEditor class for writing pyscript in tkinter
 
 Created on 2026.01.28
 Contributors:
@@ -17,7 +17,7 @@ from ttkbootstrap.widgets.scrolled import ScrolledText
 logger = logging.getLogger(__name__)
 
 
-class Editor(ttk.Frame):
+class PyscriptEditor(ttk.Frame):
     DELTA_PER_ZOOM = 120
 
     def __init__(
@@ -106,7 +106,7 @@ class Editor(ttk.Frame):
             logger.error(f"Missing PyScript file at '{pyscript_path}'")
 
     def clear(self) -> None:
-        logger.debug(f"Clearing editor text")
+        logger.debug(f"Clearing PyScript editor text")
 
         self.text.delete("1.0", ttkc.END)
 

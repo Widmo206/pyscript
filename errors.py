@@ -9,11 +9,6 @@ Contributors:
 from yaml.parser import ParserError
 
 
-class LevelParserError(ParserError):
-    """Raised when parsing a level yaml file fails."""
-    pass
-
-
 class UnknownTileTypeError(ValueError):
     """Raised when a tile is asked to convert a character to a type that doesn't exist."""
     pass

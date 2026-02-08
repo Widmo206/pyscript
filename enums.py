@@ -9,6 +9,8 @@ from enum import auto, Enum
 from pathlib import Path
 from PIL import Image
 
+from errors import UnknownTileTypeError
+
 
 class TileType(Enum):
     BLOCKED = ("X", None, None, False)
@@ -43,6 +45,10 @@ class TileType(Enum):
         obj.walkable = walkable
 
         return obj
+
+    @classmethod
+    def _missing_(cls, value):
+        raise UnknownTileTypeError(f"No tile type matching value '{value}'")
 
 
 class TokenType(Enum):

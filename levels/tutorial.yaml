@@ -1,13 +1,6 @@
 name: "Tutorial"
+pyscript_path: "pyscript/tutorial.pyscript"
 tilemap_layout: |-
   G
   O
   P
-pyscript: |
-  """
-  Welcome to PyScript !
-  
-  blablalablablblablablabablajnkjlswnkflnabw erclkgqlirgb
-  """
-  
-  hello_world()

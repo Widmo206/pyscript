@@ -5,6 +5,7 @@ Contributors:
     Romcode
 """
 
+import logging
 from PIL import ImageTk, Image
 import tkinter as tk
 
@@ -13,6 +14,8 @@ import ttkbootstrap.constants as ttkc
 
 from enums import TileType
 from errors import UnknownTileTypeError
+
+logger = logging.getLogger(__name__)
 
 
 class Tile(ttk.Label):
@@ -28,10 +31,9 @@ class Tile(ttk.Label):
         if isinstance(tile_type, str):
             try:
                 self.tile_type = TileType(tile_type)
-            except ValueError as e:
-                raise UnknownTileTypeError(
-                    f"No tile type matching character: '{self.tile_type}'"
-                ) from e
+            except UnknownTileTypeError:
+                logger.error(f"No tile type matching character '{self.tile_type}'")
+                self.tile_type = TileType.EMPTY
         else:
             self.tile_type = tile_type
 

@@ -5,6 +5,7 @@ Contributors:
     Romcode
 """
 
+import logging
 from pathlib import Path
 import tkinter as tk
 
@@ -13,6 +14,8 @@ import ttkbootstrap.constants as ttkc
 
 from level_player import LevelPlayer
 from level_select import LevelSelect
+
+logger = logging.getLogger(__name__)
 
 
 class LevelManager(ttk.Frame):
@@ -25,6 +28,8 @@ class LevelManager(ttk.Frame):
         self.open_level_select()
 
     def open_level(self, level_path: Path) -> None:
+        logger.debug(f"Opening level '{level_path}'")
+
         if self.level_select is not None:
             self.level_select.pack_forget()
             self.level_select.destroy()
@@ -37,6 +42,8 @@ class LevelManager(ttk.Frame):
         self.event_generate("<<LevelOpened>>")
 
     def open_level_select(self) -> None:
+        logger.debug(f"Opening level select")
+
         if self.level_player is not None:
             self.level_player.pack_forget()
             self.level_player.destroy()
@@ -45,6 +52,8 @@ class LevelManager(ttk.Frame):
         self.level_select = LevelSelect(self)
         self.level_select.pack(anchor=ttkc.CENTER, fill=ttkc.BOTH, expand=True)
         self.level_select.bind("<<LevelSelected>>", self._on_level_select_level_selected)
+
+        self.event_generate("<<LevelSelectOpened>>")
 
     def _on_level_select_level_selected(self, _event: tk.Event) -> None:
         self.open_level(self.level_select.selected_level_path)

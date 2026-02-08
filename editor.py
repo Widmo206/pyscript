@@ -5,12 +5,16 @@ Contributors:
     Romcode
 """
 
+import logging
 from math import ceil, floor
+from pathlib import Path
 import tkinter as tk
 
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 from ttkbootstrap.widgets.scrolled import ScrolledText
+
+logger = logging.getLogger(__name__)
 
 
 class Editor(ttk.Frame):
@@ -80,7 +84,31 @@ class Editor(ttk.Frame):
         self.text.bind('<Control-MouseWheel>', self._on_zoom)
         self.line_text.bind('<Control-MouseWheel>', self._on_zoom)
 
+        for seqence in (
+            "<Button-1>",
+            "<B1-Motion>",
+            "<Double-Button-1>",
+            "<Triple-Button-1>",
+        ):
+            self.line_text.bind(seqence, lambda _: "break")
+
         self._update_line_numbers()
+
+    def open_pyscript(self, pyscript_path: Path) -> None:
+        self.clear()
+
+        logger.debug(f"Opening PyScript '{pyscript_path}'")
+
+        try:
+            with open(pyscript_path, "r", encoding="utf-8") as pyscript_file:
+                self.text.insert("1.0", pyscript_file.read())
+        except FileNotFoundError:
+            logger.error(f"Missing PyScript file at '{pyscript_path}'")
+
+    def clear(self) -> None:
+        logger.debug(f"Clearing editor text")
+
+        self.text.delete("1.0", ttkc.END)
 
     def zoom(self, zoom_delta: int) -> None:
         if zoom_delta == 0:
@@ -125,8 +153,8 @@ class Editor(ttk.Frame):
 
     def _update_line_numbers(self) -> None:
         first, _ = self.line_text.yview()
-        self.line_text.config(state="normal")
-        self.line_text.delete("1.0", "end")
+        self.line_text.config(state=ttkc.NORMAL)
+        self.line_text.delete("1.0", ttkc.END)
 
         line_count = int(self.text.index("end-1c").split(".")[0])
         numbers = "\n".join(
@@ -137,12 +165,12 @@ class Editor(ttk.Frame):
         self.line_text.insert("1.0", numbers)
 
         if self.text.focus_get() == self.text:
-            current_line = int(self.text.index("insert").split(".")[0])
+            current_line = int(self.text.index(ttkc.INSERT).split(".")[0])
             self.line_text.tag_add(
                 "active_line",
                 f"{current_line}.0",
                 f"{current_line}.end",
             )
 
-        self.line_text.config(state="disabled")
+        self.line_text.config(state=ttkc.DISABLED)
         self.line_text.yview_moveto(first)

@@ -5,6 +5,7 @@ Contributors:
     Romcode
 """
 
+import logging
 from pathlib import Path
 import tkinter as tk
 
@@ -14,6 +15,8 @@ import ttkbootstrap.constants as ttkc
 from level import Level
 from level_bar import LevelBar
 from tilemap import Tilemap
+
+logger = logging.getLogger(__name__)
 
 
 class LevelPlayer(ttk.Frame):
@@ -31,6 +34,7 @@ class LevelPlayer(ttk.Frame):
         self.level_path = level_path
         self.level = Level.from_path(self.level_path)
 
+        logger.debug(f"Creating tilemap from layout\n{self.level.tilemap_layout}")
         self.tilemap = Tilemap(self, self.level.tilemap_layout)
         self.tilemap.grid(column=0, row=0, sticky=ttkc.NSEW)
 

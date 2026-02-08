@@ -5,6 +5,8 @@ Contributors:
     Romcode
 """
 
+import logging
+from pathlib import Path
 import tkinter as tk
 
 import ttkbootstrap as ttk
@@ -13,6 +15,8 @@ import ttkbootstrap.constants as ttkc
 from editor import Editor
 from level_manager import LevelManager
 from menu_bar import MenuBar
+
+logger = logging.getLogger(__name__)
 
 
 class Interface(ttk.Window):
@@ -61,13 +65,24 @@ class Interface(ttk.Window):
         self.paned_window.paneconfig(self.level_manager, minsize=370)
 
         self.level_manager.bind("<<LevelOpened>>", self._on_level_manager_level_opened)
+        self.level_manager.bind("<<LevelSelectOpened>>", self._on_level_manager_level_select_opened)
+        self.level_manager.event_generate("<<LevelSelectOpened>>")
 
     def toggle_fullscreen(self) -> None:
+        logger.debug(f"Toggling fullscreen mode")
+
         self.attributes(
             "-fullscreen",
             not self.attributes("-fullscreen"),
         )
 
     def _on_level_manager_level_opened(self, _event: tk.Event) -> None:
-        self.editor.text.delete("1.0", "end")
-        self.editor.text.insert("1.0", self.level_manager.level_player.level.pyscript)
+        pyscript_path = self.level_manager.level_player.level.pyscript_path
+        if pyscript_path is None:
+            logger.warning(f"Loaded level has no initial PyScript")
+            self.editor.clear()
+        else:
+            self.editor.open_pyscript(pyscript_path)
+
+    def _on_level_manager_level_select_opened(self, _event: tk.Event) -> None:
+        self.editor.open_pyscript(Path("pyscript/level_select.pyscript"))

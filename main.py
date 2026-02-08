@@ -5,6 +5,8 @@ Contributors:
     Romcode
 """
 
+import logging
+
 from interface import Interface
 
 
@@ -14,6 +16,16 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    open("latest.log", "w").close()
+    logging.basicConfig(
+        filename='latest.log',
+        level=logging.DEBUG,
+        format="%(asctime)s.%(msecs)03d | %(levelname)-7s | %(name)-13s | %(message)s",
+        datefmt='%Y.%m.%d %H:%M:%S',
+    )
+    # Needed because PIL was flooding the logs
+    logging.getLogger('PIL.PngImagePlugin').setLevel(logging.WARNING)
+
     main()
 else:
     raise RuntimeError("main.py should not be imported")

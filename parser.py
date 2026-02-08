@@ -8,6 +8,7 @@ Contributors:
 from dataclasses import dataclass
 import logging
 from string import ascii_letters, digits, whitespace
+from pathlib import Path
 from typing import Callable, Type, Any
 
 from enums import TokenType
@@ -101,9 +102,13 @@ class Token(object):
 class Parser(object):
     functions: FunctionHolder
     file: str
-    path: str
+    path: Path
 
-    def __init__(self, fh: FunctionHolder, path: str="code.txt"):
+    def __init__(
+        self,
+        fh: FunctionHolder,
+        path: Path = Path("pyscript/test.pyscript")
+    ):
         self.functions = fh
         with open(path, "rt") as file:
             self.file = file.read()

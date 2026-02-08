@@ -60,8 +60,14 @@ class Interface(ttk.Window):
 
         self.paned_window.paneconfig(self.level_manager, minsize=370)
 
+        self.level_manager.bind("<<LevelOpened>>", self._on_level_manager_level_opened)
+
     def toggle_fullscreen(self) -> None:
         self.attributes(
             "-fullscreen",
             not self.attributes("-fullscreen"),
         )
+
+    def _on_level_manager_level_opened(self, _event: tk.Event) -> None:
+        self.editor.text.delete("1.0", "end")
+        self.editor.text.insert("1.0", self.level_manager.level_player.level.pyscript)

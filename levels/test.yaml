@@ -1,9 +1,9 @@
 name: "Test"
 tilemap_layout: |-
-    GOOOO
-    XXXXO
-    OOOXO
-    OXOXO
-    PXOOO
+  GOOOO
+  XXXXO
+  OOOXO
+  OXOXO
+  PXOOO
 pyscript: |
   hello_world()

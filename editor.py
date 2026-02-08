@@ -53,7 +53,13 @@ class Editor(ttk.Frame):
         self.line_text.tag_config("active_line", foreground=style.colors.info)
         self.line_text.pack(side=ttkc.LEFT, fill=ttkc.Y)
 
-        self.scrolled_text = ScrolledText(self, hbar=True, autohide=True, padding=0)
+        self.scrolled_text = ScrolledText(
+            self,
+            hbar=True,
+            autohide=True,
+            padding=0,
+        )
+        self.scrolled_text.vbar.config(command=self._on_scrollbar)
         self.scrolled_text.pack(side=ttkc.LEFT, fill=ttkc.BOTH, expand=True)
 
         self.text = self.scrolled_text.text
@@ -62,10 +68,8 @@ class Editor(ttk.Frame):
             padx=self.font_size * self.padx_ratio,
             highlightthickness=0,
             bg=style.colors.bg,
+            yscrollcommand=self._on_text_scroll,
         )
-
-        self.text.config(yscrollcommand=self._on_text_scroll)
-        self.scrolled_text.vbar.config(command=self._on_scrollbar)
 
         self.text.bind("<<Modified>>", self._on_change)
         self.text.bind("<Configure>", self._on_change)

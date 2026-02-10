@@ -51,7 +51,7 @@ class Tilemap(ttk.Frame):
                 self.tiles.append(tile)
 
     def update_tile_size(self) -> None:
-        padding = self.cget("padding")[0]
+        padding = int(str(self.cget("padding")[0])) # Weird conversion issues
         tile_size = floor(min(
             (self.winfo_width() - padding * 2) / self.width,
             (self.winfo_height() - padding * 2) / self.height,

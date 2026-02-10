@@ -13,6 +13,7 @@ from typing import Callable
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
+from common import select_pyscript
 from enums import VirtualEventSequence as Ves
 from level_manager import LevelManager
 from menu_bar import MenuBar
@@ -66,11 +67,27 @@ class Interface(ttk.Window):
 
         self.paned_window.paneconfig(self.level_manager, minsize=370)
 
-        self.menu_bar.bind(Ves.FILE_NEW, lambda _: self.pyscript_manager.pyscript_editor.clear())
-        self.menu_bar.bind(Ves.EXIT, lambda _: self.destroy())
+        self.menu_bar.bind(
+            Ves.FILE_NEW,
+            lambda _: self.pyscript_manager.pyscript_editor.clear(),
+        )
+        self.menu_bar.bind(
+            Ves.FILE_OPEN,
+            lambda _: self.pyscript_manager.pyscript_editor.open_pyscript(select_pyscript()),
+        )
+        self.menu_bar.bind(
+            Ves.EXIT,
+            lambda _: self.destroy(),
+        )
 
-        self.level_manager.bind(Ves.LEVEL_OPENED, self._on_level_manager_level_opened)
-        self.level_manager.bind(Ves.LEVEL_SELECT_OPENED, self._on_level_manager_level_select_opened)
+        self.level_manager.bind(
+            Ves.LEVEL_OPENED,
+            self._on_level_manager_level_opened,
+        )
+        self.level_manager.bind(
+            Ves.LEVEL_SELECT_OPENED,
+            self._on_level_manager_level_select_opened,
+        )
         self.level_manager.event_generate(Ves.LEVEL_SELECT_OPENED)
 
     def toggle_fullscreen(self) -> None:

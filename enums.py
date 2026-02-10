@@ -74,7 +74,7 @@ class TokenType(Enum):
 class VirtualEventSequence(str, Enum):
     @staticmethod
     def _generate_next_value_(name: str, *_args) -> str:
-        return f"<<{name.title().replace("_", "")}>>"
+        return f"<<{name.title().replace('_', '')}>>"
 
     CLICKED             = auto()
     EXIT                = auto()

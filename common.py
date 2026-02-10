@@ -21,6 +21,7 @@ def bind_recursive(
     for child in widget.winfo_children():
         bind_recursive(child, sequence, func, add)
 
+
 def print_enum(enum: Enum) -> None:
     """Nicely fromats and prints enum members for debugging purposes."""
     width = max(len(str(entry)) for entry in enum)
@@ -29,3 +30,7 @@ def print_enum(enum: Enum) -> None:
             print(f"{str(entry).ljust(width)} = '{entry.value}'")
         else:
             print(f"{str(entry).ljust(width)} = {entry.value}")
+
+
+def select_pyscript() -> None:
+    ...

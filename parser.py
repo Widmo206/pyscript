@@ -102,6 +102,8 @@ class Token(object):
 @dataclass
 class Parser(object):
     functions: FunctionHolder
+    variables: dict
+    constants: dict
     file: str
     path: Path
 
@@ -297,6 +299,26 @@ class Parser(object):
         logger.info(f"Finished tokenizing '{self.path}' into {len(tokens)} tokens")
         return tokens
 
+    def parse(self, tokens: list[Token]):
+        """Make sense of the tokens."""
+        linebreaks = (TokenType.SEMICOLON, TokenType.INDENT, TokenType.DEINDENT)
+        lines = []
+        line = []
+        for token in tokens:
+            line.append(token)
+            if token.type in linebreaks:
+                lines.append(line)
+                line = []
+        return lines
+
+    def compile(self):
+        """"Compile" the parsers result into a python-based pseudo-assembly format that can be executed
+        by the Player's processor.
+
+        see /pyscript/test.ass for prototype
+        """
+        raise NotImplementedError("NYI; get the parser done first")
+
 
 if __name__ == "__main__":
     # clear the log file (doesn't happen otherwise, idk why)
@@ -318,4 +340,6 @@ if __name__ == "__main__":
     #fh.run("hello")
 
     parser = Parser(fh)
-    print(parser.tokenize())
+    tokenized = parser.tokenize()
+    parsed = parser.parse(tokenized)
+    print(parsed)

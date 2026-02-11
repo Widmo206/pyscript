@@ -54,21 +54,27 @@ class TileType(Enum):
 
 
 class TokenType(Enum):
-    NOP         = auto()
+    NOP         = auto() # pass
     KEYWORD     = auto()
     REFERENCE   = auto()
-    OPEN_PAREN  = auto()
-    CLOSE_PAREN = auto()
-    SEMICOLON   = auto()
-    ASSIGN      = auto()
-    STRING_LIT  = auto()
-    INT_LIT     = auto()
-    FLOAT_LIT   = auto()
-    COMMA       = auto()
-    PLUS        = auto()
-    DASH        = auto()
-    STAR        = auto()
-    SLASH       = auto()
+    # control flow
+    SEMICOLON   = auto() # ;
+    INDENT      = auto() # {
+    DEINDENT    = auto() # }
+    # statements
+    ASSIGN      = auto() # =
+    OPEN_PAREN  = auto() # (
+    CLOSE_PAREN = auto() # )
+    COMMA       = auto() # ,
+    # data types
+    STRING_LIT  = auto() # "abcd"
+    INT_LIT     = auto() # 1234
+    FLOAT_LIT   = auto() # 1.2e3
+    # operators
+    PLUS        = auto() # +
+    MINUS       = auto() # -
+    STAR        = auto() # *
+    SLASH       = auto() # /
 
 
 class VirtualEventSequence(str, Enum):

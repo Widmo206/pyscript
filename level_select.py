@@ -34,7 +34,7 @@ class LevelSelect(ScrolledFrame):
         self.selected_level_number: int | None = None
         self.selected_level_path: Path | None = None
 
-        for i, level_path in enumerate(Level.PATHS * 50):
+        for i, level_path in enumerate(Level.PATHS):
             level_entry = LevelEntry(self, i + 1, level_path)
             level_entry.bind(Ves.CLICKED, self._on_level_entry_clicked)
             level_entry.grid(row=i * 2, column=0, sticky=tk.EW)

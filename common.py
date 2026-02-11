@@ -16,6 +16,8 @@ from platformdirs import user_data_dir
 APP_NAME = "PyScript"
 APP_AUTHOR = "WidRom"
 USER_DATA_DIR = Path(user_data_dir(APP_NAME, APP_AUTHOR))
+SOLUTIONS_DIR = USER_DATA_DIR / "solutions"
+SAVE_PATH = USER_DATA_DIR / "save.yaml"
 
 
 def bind_recursive(
@@ -41,6 +43,6 @@ def print_enum(enum: Enum) -> None:
 
 
 def select_pyscript() -> str:
-    return askopenfilename(
+    return Path(askopenfilename(
         initialdir=USER_DATA_DIR,
-    )
+    ))

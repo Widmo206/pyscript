@@ -8,7 +8,6 @@ Contributors:
 import logging
 from pathlib import Path
 import tkinter as tk
-from typing import Callable
 
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
@@ -19,20 +18,41 @@ from level_manager import LevelManager
 from menu_bar import MenuBar
 from pyscript_manager import PyscriptManager
 
+THEME_COLORS = {
+    "primary": "#191919",
+    "secondary": "#444444",
+    "success": "#00bc8c",
+    "info": "#3498db",
+    "warning": "#f39c12",
+    "danger": "#e74c3c",
+    "light": "#ADB5BD",
+    "dark": "#303030",
+    "bg": "#222222",
+    "fg": "#ffffff",
+    "selectbg": "#555555",
+    "selectfg": "#ffffff",
+    "border": "#222222",
+    "inputfg": "#ffffff",
+    "inputbg": "#2f2f2f",
+}
+
 logger = logging.getLogger(__name__)
 
 
 class Interface(ttk.Window):
     def __init__(self, **kwargs) -> None:
         kwargs.setdefault("title", "PyScript")
-        kwargs.setdefault("themename", "darkly")
         super().__init__(**kwargs)
 
         self.geometry("1280x720")
         self.state("zoom")
         self.bind("<F11>", lambda _: self.toggle_fullscreen())
 
-        self.style.colors.set("primary", "#191919")
+        for key, color in THEME_COLORS.items():
+            self.style.colors.set(key, color)
+        self.style.configure("TLabel", background=self.style.colors.bg)
+        self.style.configure("TNotebook", bordercolor=self.style.colors.bg)
+        self.style.configure("TNotebook.Tab", borderwidth=0)
 
         self.main_frame = ttk.Frame(self)
         self.main_frame.columnconfigure(0, weight=1)
@@ -77,7 +97,7 @@ class Interface(ttk.Window):
         )
         self.menu_bar.bind(
             Ves.EXIT,
-            lambda _: self.destroy(),
+            self._on_menu_bar_exit,
         )
 
         self.level_manager.bind(
@@ -91,12 +111,9 @@ class Interface(ttk.Window):
         self.level_manager.event_generate(Ves.LEVEL_SELECT_OPENED)
 
     def toggle_fullscreen(self) -> None:
-        logger.debug(f"Toggling fullscreen mode")
-
-        self.attributes(
-            "-fullscreen",
-            not self.attributes("-fullscreen"),
-        )
+        new_mode = not self.attributes("-fullscreen")
+        logger.debug(f"Setting fullscreen mode to {new_mode}")
+        self.attributes("-fullscreen", new_mode)
 
     def _on_level_manager_level_opened(self, _event: tk.Event) -> None:
         pyscript_path = self.level_manager.level_player.level.pyscript_path
@@ -108,3 +125,8 @@ class Interface(ttk.Window):
 
     def _on_level_manager_level_select_opened(self, _event: tk.Event) -> None:
         self.pyscript_manager.pyscript_editor.open_pyscript(Path("pyscript/level_select.pyscript"))
+
+    def _on_menu_bar_exit(self, _event: tk.Event) -> None:
+        logger.debug("Exiting application")
+        self.destroy()
+        

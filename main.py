@@ -8,19 +8,19 @@ Contributors:
 
 import logging
 
-from common import USER_DATA_DIR
+from common import SOLUTIONS_DIR
 from interface import Interface
 
 
 def main() -> None:
-    USER_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    SOLUTIONS_DIR.mkdir(parents=True, exist_ok=True)
 
     interface = Interface()
     interface.mainloop()
 
 
 def setup_logging() -> None:
-    open("latest.log", "w").close() # Clears the previous logs
+    open("latest.log", "w", encoding="utf-8").close() # Clears the previous logs
     logging.basicConfig(
         filename='latest.log',
         level=logging.DEBUG,

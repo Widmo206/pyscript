@@ -269,8 +269,8 @@ class Parser(object):
                 continue
 
             elif char == "-":
-                log_token(TokenType.DASH)
-                tokens.append(Token(TokenType.DASH, None))
+                log_token(TokenType.MINUS)
+                tokens.append(Token(TokenType.MINUS, None))
                 c += 1
                 continue
 

@@ -52,6 +52,7 @@ class Function(object):
         return self.func.__name__
 
 
+# do we even need this?
 @dataclass
 class FunctionHolder(object):
     functions: dict[str, Function]
@@ -127,13 +128,10 @@ class Parser(object):
         while c < len(self.file):
             current_token = ""
             char = self.file[c]
-            
-            if char == "\n":
-                line += 1
-                c += 1
-                continue
 
             if char in whitespace:
+                if char == "\n":
+                    line += 1
                 #logger.debug(f"Found whitespace at {c}")
                 c += 1
                 continue
@@ -228,6 +226,18 @@ class Parser(object):
                 log_token(TokenType.STRING_LIT)
                 continue
 
+            elif char == "{":
+                log_token(TokenType.INDENT)
+                tokens.append(Token(TokenType.INDENT, None))
+                c += 1
+                continue
+
+            elif char == "}":
+                log_token(TokenType.DEINDENT)
+                tokens.append(Token(TokenType.DEINDENT, None))
+                c += 1
+                continue
+
             elif char == "=":
                 log_token(TokenType.ASSIGN)
                 tokens.append(Token(TokenType.ASSIGN, None))
@@ -292,7 +302,12 @@ if __name__ == "__main__":
     # clear the log file (doesn't happen otherwise, idk why)
     with open("latest.log", "wt") as _:
         pass
-    logging.basicConfig(filename='latest.log', level=logging.DEBUG, format="%(asctime)s.%(msecs)03d | %(levelname)-5s | %(name)-10s | %(message)s", datefmt='%Y.%m.%d %H:%M:%S')
+    logging.basicConfig(
+        filename='latest.log',
+        level=logging.DEBUG,
+        format="%(asctime)s.%(msecs)03d | %(levelname)-5s | %(name)-10s | %(message)s",
+        datefmt='%Y.%m.%d %H:%M:%S',
+        )
 
     fh = FunctionHolder()
 

@@ -8,10 +8,9 @@ Contributors:
 import logging
 from pathlib import Path
 import tkinter as tk
+from tkinter import ttk
 
 from pyscript_editor_tab import PyscriptEditorTab
-import ttkbootstrap as ttk
-import ttkbootstrap.constants as ttkc
 
 logger = logging.getLogger(__name__)
 

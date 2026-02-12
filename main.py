@@ -28,7 +28,7 @@ def setup_logging() -> None:
         datefmt='%Y.%m.%d %H:%M:%S',
     )
     # Needed because PIL was flooding the logs
-    logging.getLogger('PIL.PngImagePlugin').setLevel(logging.WARNING)
+    logging.getLogger("PIL.PngImagePlugin").setLevel(logging.WARNING)
 
 
 if __name__ == "__main__":

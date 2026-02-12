@@ -18,41 +18,21 @@ from level_manager import LevelManager
 from menu_bar import MenuBar
 from pyscript_manager import PyscriptManager
 
-THEME_COLORS = {
-    "primary": "#191919",
-    "secondary": "#444444",
-    "success": "#00bc8c",
-    "info": "#3498db",
-    "warning": "#f39c12",
-    "danger": "#e74c3c",
-    "light": "#ADB5BD",
-    "dark": "#303030",
-    "bg": "#222222",
-    "fg": "#ffffff",
-    "selectbg": "#555555",
-    "selectfg": "#ffffff",
-    "border": "#222222",
-    "inputfg": "#ffffff",
-    "inputbg": "#2f2f2f",
-}
-
 logger = logging.getLogger(__name__)
 
 
 class Interface(ttk.Window):
     def __init__(self, **kwargs) -> None:
         kwargs.setdefault("title", "PyScript")
+        kwargs.setdefault("themename", "darkly")
         super().__init__(**kwargs)
 
         self.geometry("1280x720")
         self.state("zoom")
         self.bind("<F11>", lambda _: self.toggle_fullscreen())
 
-        for key, color in THEME_COLORS.items():
-            self.style.colors.set(key, color)
-        self.style.configure("TLabel", background=self.style.colors.bg)
-        self.style.configure("TNotebook", bordercolor=self.style.colors.bg)
-        self.style.configure("TNotebook.Tab", borderwidth=0)
+        self.style.colors.set("primary", "#191919")
+        self.style.layout("TNotebook", [])
 
         self.main_frame = ttk.Frame(self)
         self.main_frame.columnconfigure(0, weight=1)

@@ -23,6 +23,26 @@ KEYWORDS = (
     "return",
     "exit",
     )
+OPERATORS = (
+    '**',
+    '//',
+    '==',
+    '!=',
+    '<=',
+    '>=',
+    '+',
+    '-',
+    '*',
+    '/',
+    '%',
+    '<',
+    '>',
+    )
+operator_initial_characters = {op[0] for op in OPERATORS}
+TOKEN_PAIRS = {
+    TokenType.OPEN_PAREN: TokenType.CLOSE_PAREN,
+    TokenType.INDENT:     TokenType.DEINDENT,
+    }
 
 
 def hello_world() -> None:
@@ -133,6 +153,7 @@ class Parser(object):
 
             if char in whitespace:
                 if char == "\n":
+                    # TODO: store line numbers in tokens
                     line += 1
                 #logger.debug(f"Found whitespace at {c}")
                 c += 1
@@ -263,37 +284,24 @@ class Parser(object):
                 tokens.append(Token(TokenType.SEMICOLON, None))
                 c += 1
                 continue
-
-            elif char == "+":
-                log_token(TokenType.PLUS)
-                tokens.append(Token(TokenType.PLUS, None))
-                c += 1
-                continue
-
-            elif char == "-":
-                log_token(TokenType.MINUS)
-                tokens.append(Token(TokenType.MINUS, None))
-                c += 1
-                continue
-
-            elif char == "*":
-                log_token(TokenType.STAR)
-                tokens.append(Token(TokenType.STAR, None))
-                c += 1
-                continue
-
-            elif char == "/":
-                log_token(TokenType.SLASH)
-                tokens.append(Token(TokenType.SLASH, None))
-                c += 1
-                continue
-
+            
             elif char == ",":
                 log_token(TokenType.COMMA)
                 tokens.append(Token(TokenType.COMMA, None))
                 c += 1
                 continue
-
+            
+            elif char in operator_initial_characters:
+                i = 0
+                while current_token + char in OPERATORS:
+                    # get the rest of the token
+                    current_token += char
+                    i += 1
+                    char = self.file[c + i]
+                tokens.append(Token(TokenType.OPERATOR, current_token))
+                c += i
+                continue
+            
             else:
                 raise UnknownTokenError(f"There are no tokens that start with '{char}' (line {line} in '{self.path}')")
         logger.info(f"Finished tokenizing '{self.path}' into {len(tokens)} tokens")
@@ -341,5 +349,6 @@ if __name__ == "__main__":
 
     parser = Parser(fh)
     tokenized = parser.tokenize()
+    print(tokenized)
     parsed = parser.parse(tokenized)
     print(parsed)

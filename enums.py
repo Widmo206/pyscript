@@ -66,15 +66,16 @@ class TokenType(Enum):
     OPEN_PAREN  = auto() # (
     CLOSE_PAREN = auto() # )
     COMMA       = auto() # ,
+    OPERATOR    = auto() # math operators like + * % ==
     # data types
     STRING_LIT  = auto() # "abcd"
     INT_LIT     = auto() # 1234
     FLOAT_LIT   = auto() # 1.2e3
-    # operators
-    PLUS        = auto() # +
-    MINUS       = auto() # -
-    STAR        = auto() # *
-    SLASH       = auto() # /
+#     # operators
+#     PLUS        = auto() # +
+#     MINUS       = auto() # -
+#     STAR        = auto() # *
+#     SLASH       = auto() # /
 
 
 class VirtualEventSequence(str, Enum):

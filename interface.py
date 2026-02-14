@@ -69,13 +69,11 @@ class Interface(ttk.Window):
 
         self.menu_bar.bind(
             Ves.FILE_NEW,
-            lambda _: self.pyscript_manager.pyscript_editor.open_pyscript(
-                self.level_manager.level_player.level_path
-            ),
+            self._on_menu_bar_file_new,
         )
         self.menu_bar.bind(
             Ves.FILE_OPEN,
-            lambda _: self.pyscript_manager.pyscript_editor.open_pyscript(select_pyscript()),
+            self._on_menu_bar_file_open,
         )
         self.menu_bar.bind(
             Ves.EXIT,
@@ -90,6 +88,10 @@ class Interface(ttk.Window):
             Ves.LEVEL_SELECT_OPENED,
             self._on_level_manager_level_select_opened,
         )
+
+        self.update_idletasks()
+        self.paned_window.sash_place(0, int(self.paned_window.winfo_width() * 0.5), 0)
+        self.pyscript_manager.sash_place(0, 0, int(self.pyscript_manager.winfo_height() * 0.75))
         self.level_manager.event_generate(Ves.LEVEL_SELECT_OPENED)
 
     def toggle_fullscreen(self) -> None:
@@ -97,18 +99,27 @@ class Interface(ttk.Window):
         logger.debug(f"Setting fullscreen mode to {new_mode}")
         self.attributes("-fullscreen", new_mode)
 
-    def _on_level_manager_level_opened(self, _event: tk.Event) -> None:
-        pyscript_path = self.level_manager.level_player.level.pyscript_path
-        if pyscript_path is None:
-            logger.warning(f"Loaded level has no initial PyScript")
-            self.pyscript_manager.pyscript_editor.clear()
+    def _on_menu_bar_file_new(self, _event: tk.Event) -> None:
+        if self.level_manager.level_player is None:
+            self.pyscript_manager.editor.new_tab()
         else:
-            self.pyscript_manager.pyscript_editor.open_pyscript(pyscript_path)
+            self.pyscript_manager.editor.open_tab_solution(self.level_manager.level_player.level.pyscript_path)
 
-    def _on_level_manager_level_select_opened(self, _event: tk.Event) -> None:
-        self.pyscript_manager.pyscript_editor.open_pyscript(Path("pyscript/level_select.pyscript"))
+    def _on_menu_bar_file_open(self, _event: tk.Event) -> None:
+        path = select_pyscript()
+        if path is not None:
+            self.pyscript_manager.editor.open_tab(path)
 
     def _on_menu_bar_exit(self, _event: tk.Event) -> None:
         logger.debug("Exiting application")
         self.destroy()
-        
+
+    def _on_level_manager_level_opened(self, _event: tk.Event) -> None:
+        pyscript_path = self.level_manager.level_player.level.pyscript_path
+        if pyscript_path is None:
+            logger.warning(f"Loaded level has no initial PyScript")
+        else:
+            self.pyscript_manager.editor.open_tab_solution(pyscript_path)
+
+    def _on_level_manager_level_select_opened(self, _event: tk.Event) -> None:
+        self.pyscript_manager.editor.open_tab(Path("pyscript/level_select.pyscript"))

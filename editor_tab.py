@@ -1,4 +1,4 @@
-"""PyscriptEditorTab class for writing pyscript in tkinter
+"""EditorTab class for writing pyscript in tkinter
 
 Created on 2026.02.11
 Contributors:
@@ -14,30 +14,38 @@ import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 from ttkbootstrap.widgets.scrolled import ScrolledText
 
+from common import PYSCRIPT_EXTENSION
+from errors import EditorTabCreationError
+
 logger = logging.getLogger(__name__)
 
 
-class PyscriptEditorTab(ttk.Frame):
+class EditorTab(ttk.Frame):
     DELTA_PER_ZOOM = 120
 
     def __init__(
         self,
         master: tk.Misc,
         style: ttk.Style,
-        pyscript_path: Path,
-        default_text: str | None = None,
+        path: Path | None = None,
+        default_content_path: Path | None = None,
         font: str = "Consolas",
         font_size: int = 11,
         min_font_size: int = 1,
-        max_font_size: int = 256,
+        max_font_size: int = 128,
         line_text_width: int = 4,
         padx_ratio: float = 0.5,
         zoom_factor: float = 1.1,
         **kwargs,
     ) -> None:
+        if path is not None and path.suffix != PYSCRIPT_EXTENSION:
+            logger.warning(f"Expected file extension '{PYSCRIPT_EXTENSION}' in path '{path}'")
+        if default_content_path is not None and default_content_path.suffix != PYSCRIPT_EXTENSION:
+            logger.warning(f"Expected file extension '{PYSCRIPT_EXTENSION}' in default_content_path '{default_content_path}'")
+
         super().__init__(master, **kwargs)
 
-        self.pyscript_path = pyscript_path
+        self.path = path
         self.font = font
         self.font_size = font_size
         self.min_font_size = min_font_size
@@ -95,15 +103,30 @@ class PyscriptEditorTab(ttk.Frame):
         ):
             self.line_text.bind(seqence, lambda _: "break")
 
-        if self.pyscript_path.is_file():
-            logger.debug(f"Loading PyScript from '{self.pyscript_path}' into tab")
-            with open(self.pyscript_path, "r", encoding="utf-8") as pyscript_file:
-                self.text.insert("1.0", pyscript_file.read())
-        elif default_text is not None:
-            logger.debug(f"No PyScript file found at '{self.pyscript_path}', using default text")
-            self.text.insert("1.0", default_text)
+        if self.path is None:
+            return
+
+        if self.path.is_file():
+            self._try_load(self.path)
         else:
-            logger.debug(f"No PyScript file found at '{self.pyscript_path}', keeping empty tab")
+            logger.debug(f"No file found at '{self.path}'")
+            if default_content_path is not None and default_content_path.is_file():
+                logger.debug(f"Using default content path '{default_content_path}'")
+                self._try_load(default_content_path)
+            else:
+                if default_content_path is None:
+                    logger.debug("No default content path provided")
+                else:
+                    logger.debug(f"No default content file found at '{default_content_path}'")
+                logger.debug("Keeping empty tab")
+
+    def _try_load(self, path: Path) -> None:
+        logger.debug(f"Loading text from '{path}'")
+        try:
+            self.text.insert("1.0", path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError) as error:
+            logger.error(f"Failed to load text from '{path}'")
+            raise EditorTabCreationError from error
 
     def zoom(self, zoom_delta: int) -> None:
         if zoom_delta == 0:
@@ -143,8 +166,9 @@ class PyscriptEditorTab(ttk.Frame):
     def _on_focus_change(self, _event: tk.Event) -> None:
         self._update_line_numbers()
 
-    def _on_zoom(self, event: tk.Event) -> None:
+    def _on_zoom(self, event: tk.Event) -> str:
         self.zoom(round(event.delta / self.DELTA_PER_ZOOM))
+        return "break"
 
     def _update_line_numbers(self) -> None:
         first, _ = self.line_text.yview()

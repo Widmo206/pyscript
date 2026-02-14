@@ -44,7 +44,6 @@ def print_enum(enum: Enum) -> None:
             print(f"{str(entry).ljust(width)} = {entry.value}")
 
 
-def select_pyscript() -> str:
-    return Path(askopenfilename(
-        initialdir=USER_DATA_DIR,
-    ))
+def select_pyscript() -> Path | None:
+    path_str = askopenfilename(initialdir=USER_DATA_DIR)
+    return Path(path_str) if path_str != "" else None

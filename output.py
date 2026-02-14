@@ -1,4 +1,4 @@
-"""PyscriptOutput class to display the output of running PyScript programs
+"""Output class to display the output of running PyScript programs
 
 Created on 2026.02.08
 Contributors:
@@ -15,7 +15,7 @@ from ttkbootstrap.widgets.scrolled import ScrolledText
 logger = logging.getLogger(__name__)
 
 
-class PyscriptOutput(ScrolledText):
+class Output(ScrolledText):
     DELTA_PER_ZOOM = 120
 
     def __init__(

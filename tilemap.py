@@ -10,7 +10,8 @@ import tkinter as tk
 
 import ttkbootstrap as ttk
 
-from tile import Tile
+from enums import Direction, TileActionType, TileType
+from tile_label import TileLabel
 
 
 class Tilemap(ttk.Frame):
@@ -44,11 +45,56 @@ class Tilemap(ttk.Frame):
         self.bind("<Configure>", lambda _: self.update_tile_size())
 
         self.tiles = []
-        for x in range(self.width):
-            for y in range(self.height):
-                tile = Tile(self.grid_frame, rows[y][x])
+        for y in range(self.height):
+            for x in range(self.width):
+                tile = TileLabel(self.grid_frame, rows[y][x])
                 tile.grid(column=x, row=y)
                 self.tiles.append(tile)
+
+        self.bind_all("<w>", lambda _: self.cycle(Direction.UP))
+        self.bind_all("<s>", lambda _: self.cycle(Direction.DOWN))
+        self.bind_all("<a>", lambda _: self.cycle(Direction.LEFT))
+        self.bind_all("<d>", lambda _: self.cycle(Direction.RIGHT))
+
+    def cycle(self, direction: Direction) -> None:
+        # TODO: Remove manual movement
+        actions = []
+        for y in range(self.height):
+            for x in range(self.width):
+                actions.append(self.get_tile(x, y).get_action())
+
+        for y in range(self.height):
+            for x in range(self.width):
+                action = actions[y * self.width + x]
+                if action is None:
+                    continue
+                match action.type:
+                    case TileActionType.MOVE:
+                        # action.direction
+                        if direction is None:
+                            continue
+                        self.move_tile(x, y, direction)
+                    case TileActionType.ATTACK:
+                        pass
+                    case _:
+                        pass
+
+    def get_tile(self, x: int, y: int) -> TileLabel | None:
+        try:
+            assert 0 <= x < self.width
+            assert 0 <= y < self.height
+            return self.tiles[y * self.width + x]
+        except (AssertionError, IndexError):
+            return None
+
+    def move_tile(self, x: int, y: int, direction: Direction) -> None:
+        from_tile = self.get_tile(x, y)
+        to_tile = self.get_tile(x + direction.x, y + direction.y)
+
+        if from_tile is not None and to_tile is not None and to_tile.tile_type.walkable:
+            to_tile.set_tile_type(from_tile.tile_type)
+            from_tile.set_tile_type(TileType.EMPTY)
+            self.update_tile_size()
 
     def update_tile_size(self) -> None:
         padding = int(str(self.cget("padding")[0])) # Weird conversion issues

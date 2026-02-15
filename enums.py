@@ -8,11 +8,29 @@ Contributors:
 from enum import auto, Enum
 from pathlib import Path
 from PIL import Image
+from typing import NamedTuple
 
 from common import print_enum
 from errors import UnknownTileTypeError
 import events
 from menu_command import MenuCommand
+
+
+class DirectionMixin(NamedTuple):
+    x: int
+    y: int
+
+
+class Direction(DirectionMixin, Enum):
+    UP    = (0, -1)
+    DOWN  = (0, 1)
+    LEFT  = (-1, 0)
+    RIGHT = (1, 0)
+
+
+class TileActionType(Enum):
+    MOVE   = auto()
+    ATTACK = auto
 
 
 class FileMenuCommand(MenuCommand, Enum):
@@ -88,10 +106,14 @@ class TokenType(Enum):
 
 
 def _test() -> None:
-    print()
-    print_enum(FileMenuCommand)
-    print()
-    print_enum(TileType)
+    for enum in (
+        Direction,
+        FileMenuCommand,
+        TileType,
+        TokenType,
+    ):
+        print()
+        print_enum(enum)
 
 
 if __name__ == "__main__":

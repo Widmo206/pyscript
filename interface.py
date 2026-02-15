@@ -6,13 +6,12 @@ Contributors:
 """
 
 import logging
-from pathlib import Path
 import tkinter as tk
 
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
-from common import select_pyscript
+import events
 from level_manager import LevelManager
 from menu_bar import MenuBar
 from pyscript_manager import PyscriptManager
@@ -70,32 +69,13 @@ class Interface(ttk.Window):
         self.paned_window.sash_place(0, int(self.paned_window.winfo_width() * 0.5), 0)
         self.pyscript_manager.sash_place(0, 0, int(self.pyscript_manager.winfo_height() * 0.75))
 
+        events.ExitRequested.connect(self._on_exit_requested)
+
     def toggle_fullscreen(self) -> None:
         new_mode = not self.attributes("-fullscreen")
         logger.debug(f"Setting fullscreen mode to {new_mode}")
         self.attributes("-fullscreen", new_mode)
 
-    def _on_menu_bar_file_new(self, _event: tk.Event) -> None:
-        if self.level_manager.level_player is None:
-            self.pyscript_manager.editor.new_tab()
-        else:
-            self.pyscript_manager.editor.open_tab_solution(self.level_manager.level_player.level.pyscript_path)
-
-    def _on_menu_bar_file_open(self, _event: tk.Event) -> None:
-        path = select_pyscript()
-        if path is not None:
-            self.pyscript_manager.editor.open_tab(path)
-
     def _on_exit_requested(self, _event: tk.Event) -> None:
         logger.debug("Exiting application")
         self.destroy()
-
-    def _on_level_manager_level_opened(self, _event: tk.Event) -> None:
-        pyscript_path = self.level_manager.level_player.level.pyscript_path
-        if pyscript_path is None:
-            logger.warning(f"Loaded level has no initial PyScript")
-        else:
-            self.pyscript_manager.editor.open_tab_solution(pyscript_path)
-
-    def _on_level_manager_level_select_opened(self, _event: tk.Event) -> None:
-        self.pyscript_manager.editor.open_tab(Path("pyscript/level_select.pyscript"))

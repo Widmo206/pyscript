@@ -11,11 +11,14 @@ import tkinter as tk
 
 import ttkbootstrap as ttk
 
-from common import get_solution_path
+from common import get_solution_path, select_pyscript
 from editor_tab import EditorTab
 from errors import EditorTabCreationError
+import events
 
 logger = logging.getLogger(__name__)
+
+LEVEL_SELECT_PYSCRIPT_PATH = Path("pyscript/level_select.pyscript")
 
 
 class Editor(ttk.Notebook):
@@ -29,6 +32,11 @@ class Editor(ttk.Notebook):
         super().__init__(master, **kwargs)
 
         self.style = style
+
+        events.FileNewRequested.connect(self._on_file_new_requested)
+        events.FileOpenRequested.connect(self._on_file_open_requested)
+        events.LevelOpened.connect(self._on_level_opened)
+        events.LevelSelectOpened.connect(self._on_level_select_opened)
 
     def new_tab(self) -> None:
         logger.debug("Creating new untitled tab")
@@ -59,3 +67,17 @@ class Editor(ttk.Notebook):
             )
         except EditorTabCreationError:
             logger.error(f"Failed to create tab '{path.name}'")
+
+    def _on_file_new_requested(self, _event: events.FileNewRequested) -> None:
+        self.new_tab()
+
+    def _on_file_open_requested(self, _event: events.FileOpenRequested) -> None:
+        path = select_pyscript()
+        if path is not None:
+            self.open_tab(path)
+
+    def _on_level_opened(self, event: events.LevelOpened) -> None:
+        self.open_tab_solution(event.level.pyscript_path)
+
+    def _on_level_select_opened(self, _event: events.LevelSelectOpened) -> None:
+        self.open_tab(LEVEL_SELECT_PYSCRIPT_PATH)

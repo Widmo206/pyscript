@@ -8,10 +8,11 @@ Contributors:
     Romcode
 """
 
+from __future__ import annotations
 from dataclasses import dataclass
 import logging
 from pathlib import Path
-from typing import Callable, ClassVar, Self
+from typing import Callable, ClassVar
 
 from level import Level
 
@@ -26,18 +27,19 @@ class Event:
 
     # We annotate with Self instead of __future__ annotations
     # because Event is too general while Self takes the form of the event subclass.
-    _listeners: ClassVar[list[Callable[[Self], None]]]
+    # Nevermind, Self is python 3.11+ only, general Event it isssss.
+    _listeners: ClassVar[list[Callable[[Event], None]]]
 
     def __init_subclass__(cls) -> None:
         cls._listeners = []
 
     @classmethod
-    def connect(cls, callback: Callable[[Self], None]) -> None:
+    def connect(cls, callback: Callable[[Event], None]) -> None:
         logger.debug(f"Connecting method '{callback.__name__}' to event '{cls.__name__}'")
         cls._listeners.append(callback)
 
     @classmethod
-    def disconnect(cls, callback: Callable[[Self], None]) -> None:
+    def disconnect(cls, callback: Callable[[Event], None]) -> None:
         logger.debug(f"Disconnection method '{callback.__name__}' from event '{cls.__name__}'")
         cls._listeners.remove(callback)
 

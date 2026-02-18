@@ -43,6 +43,15 @@ TOKEN_PAIRS = {
     TokenType.OPEN_PAREN: TokenType.CLOSE_PAREN,
     TokenType.INDENT:     TokenType.DEINDENT,
     }
+SINGLE_CHAR_TOKENS = {
+    "{": TokenType.INDENT,
+    "}": TokenType.DEINDENT,
+    "=": TokenType.ASSIGN,
+    "(": TokenType.OPEN_PAREN,
+    ")": TokenType.CLOSE_PAREN,
+    ";": TokenType.SEMICOLON,
+    ",": TokenType.COMMA,
+    }
 
 
 def hello_world() -> None:
@@ -128,11 +137,11 @@ class Instruction(object):
 class Processor(object):
     program: list
     stack: list
-    
+
     def __init__(self, program: list):
         self.program = program
         self.stack = []
-        
+
     def run(self):
         ...
 
@@ -161,10 +170,18 @@ class Parser(object):
         token_type = TokenType.NOP
         logger.info(f"Start tokenizing '{self.path}'")
         line = 1
-        def log_token(token_type: TokenType) -> None:
-            nonlocal line
-            logger.debug(f"Line {line}: found {token_type._name_}")
         c = 0
+        def add_token(token_type: TokenType, value: Any=None, offset: int=1) -> None:
+            nonlocal line
+            nonlocal c
+            logger.debug(f"Line {line}: found {token_type._name_}")
+            tokens.append(Token(token_type, value))
+            c += offset
+        # if you have a token (like "=") that starts with the same char as an operator (like "=="),
+        # one of them will claim that character, even if it's not the correct one
+        # solution: put operators first and raise this flag if the check fails
+        # flag is lowered immediately after the operator section
+        skip_operators = False
         while c < len(self.file):
             current_token = ""
             char = self.file[c]
@@ -175,7 +192,6 @@ class Parser(object):
                     line += 1
                 #logger.debug(f"Found whitespace at {c}")
                 c += 1
-                continue
 
             elif char in ascii_letters:
                 i = 0
@@ -186,13 +202,9 @@ class Parser(object):
                     char = self.file[c + i]
                 if current_token in KEYWORDS:
                     token_type = TokenType.KEYWORD
-                    log_token(TokenType.KEYWORD)
                 else:
                     token_type = TokenType.REFERENCE
-                    log_token(TokenType.REFERENCE)
-                tokens.append(Token(token_type, current_token))
-                c += i
-                continue
+                add_token(token_type, current_token, i)
 
             elif char in digits:
                 is_int = True
@@ -233,13 +245,9 @@ class Parser(object):
                         raise SyntaxError(f"Invalid float literal in line {line}: '{current_token}'")
 
                 if is_int:
-                    tokens.append(Token(TokenType.INT_LIT, int(current_token)))
-                    log_token(TokenType.INT_LIT)
+                    add_token(TokenType.INT_LIT, int(current_token), i)
                 else:
-                    tokens.append(Token(TokenType.FLOAT_LIT, float(current_token)))
-                    log_token(TokenType.FLOAT_LIT)
-                c += i
-                continue
+                    add_token(TokenType.FLOAT_LIT, float(current_token), i)
 
             elif char in QUOTES:
                 start_quote = char
@@ -263,65 +271,28 @@ class Parser(object):
                             break
                     else:
                         current_token += char
-                tokens.append(Token(TokenType.STRING_LIT, current_token))
-                log_token(TokenType.STRING_LIT)
-                continue
+                # offset already handled
+                add_token(TokenType.STRING_LIT, current_token, 0)
 
-            elif char == "{":
-                log_token(TokenType.INDENT)
-                tokens.append(Token(TokenType.INDENT, None))
-                c += 1
-                continue
-
-            elif char == "}":
-                log_token(TokenType.DEINDENT)
-                tokens.append(Token(TokenType.DEINDENT, None))
-                c += 1
-                continue
-
-            elif char == "=":
-                log_token(TokenType.ASSIGN)
-                tokens.append(Token(TokenType.ASSIGN, None))
-                c += 1
-                continue
-
-            elif char == "(":
-                log_token(TokenType.OPEN_PAREN)
-                tokens.append(Token(TokenType.OPEN_PAREN, None))
-                c += 1
-                continue
-
-            elif char == ")":
-                log_token(TokenType.CLOSE_PAREN)
-                tokens.append(Token(TokenType.CLOSE_PAREN, None))
-                c += 1
-                continue
-
-            elif char == ";":
-                log_token(TokenType.SEMICOLON)
-                tokens.append(Token(TokenType.SEMICOLON, None))
-                c += 1
-                continue
-            
-            elif char == ",":
-                log_token(TokenType.COMMA)
-                tokens.append(Token(TokenType.COMMA, None))
-                c += 1
-                continue
-            
-            elif char in operator_initial_characters:
+            elif char in operator_initial_characters and not skip_operators:
                 i = 0
                 while current_token + char in OPERATORS:
                     # get the rest of the token
                     current_token += char
                     i += 1
                     char = self.file[c + i]
-                tokens.append(Token(TokenType.OPERATOR, current_token))
-                c += i
-                continue
-            
+                if current_token not in OPERATORS:
+                    # prevent infinite loop
+                    skip_operators = True
+                    continue
+                add_token(TokenType.OPERATOR, current_token, i)
+
+            elif char in SINGLE_CHAR_TOKENS.keys():
+                add_token(SINGLE_CHAR_TOKENS[char])
+
             else:
-                raise UnknownTokenError(f"There are no tokens that start with '{char}' (line {line} in '{self.path}')")
+                 raise UnknownTokenError(f"There are no tokens that start with '{char}' (line {line} in '{self.path}')")
+            skip_operators = False
         logger.info(f"Finished tokenizing '{self.path}' into {len(tokens)} tokens")
         return tokens
 

@@ -10,11 +10,9 @@ from PIL import ImageTk, Image
 import tkinter as tk
 
 import ttkbootstrap as ttk
-import ttkbootstrap.constants as ttkc
 
-from tile_action import TileAction
-from enums import TileActionType, Direction, TileType
-from errors import UnknownTileTypeError
+from enums import TileType
+import events
 
 logger = logging.getLogger(__name__)
 
@@ -27,25 +25,27 @@ class TileLabel(ttk.Label):
         self,
         master: tk.Misc,
         tile_type: TileType | str = TileType.EMPTY,
+        tile_instance_event: type[events.TileTypeChanged] | None = None,
         tile_size: int = MIN_SIZE,
         **kwargs,
     ) -> None:
         kwargs.setdefault("borderwidth", 0)
         super().__init__(master, **kwargs)
 
+        self.tile_type = TileType.normalize(tile_type)
         self.tile_size = tile_size
         self.resize(self.tile_size)
 
-    def resize(self, tile_size: int) -> None:
-        tile_size = max(tile_size, self.MIN_SIZE)
+        # This is needed to allow conceptual tiles to remotely update their visual counterpart.
+        if tile_instance_event is not None:
+            tile_instance_event.connect(self._on_remote_tile_type_changed)
 
-        if tile_size < 1:
-            raise ValueError(f"TileLabel size ({tile_size}) cannot be less than 1")
+    def resize(self, tile_size: int | None = None) -> None:
+        if tile_size is not None:
+            self.tile_size = max(tile_size, self.MIN_SIZE)
 
-        self.tile_size = tile_size
-
-        image_size = round(tile_size * (1 - self.PADDING_RATIO))
-        pad_size = round(tile_size * self.PADDING_RATIO / 2)
+        image_size = round(self.tile_size * (1 - self.PADDING_RATIO))
+        pad_size = round(self.tile_size * self.PADDING_RATIO / 2)
 
         if self.tile_type.image is None:
             self.image_tk = None
@@ -57,3 +57,10 @@ class TileLabel(ttk.Label):
             self.image_tk = ImageTk.PhotoImage(image)
 
         self.configure(image=self.image_tk, padding=pad_size)
+
+    def set_tile_type(self, tile_type: TileType | str) -> None:
+        self.tile_type = TileType.normalize(tile_type)
+        self.resize()
+
+    def _on_remote_tile_type_changed(self, event: events.TileTypeChanged) -> None:
+        self.set_tile_type(event.tile_type)

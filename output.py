@@ -9,7 +9,6 @@ import logging
 import tkinter as tk
 
 import ttkbootstrap as ttk
-import ttkbootstrap.constants as ttkc
 from ttkbootstrap.widgets.scrolled import ScrolledText
 
 logger = logging.getLogger(__name__)

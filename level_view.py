@@ -10,7 +10,6 @@ import tkinter as tk
 
 import ttkbootstrap as ttk
 
-from enums import Direction, TileActionType, TileType
 import events
 from tile_label import TileLabel
 
@@ -19,13 +18,13 @@ class LevelView(ttk.Frame):
     def __init__(
         self,
         master: tk.Misc,
-        layout: str,
+        event: events.LevelOpened,
         **kwargs,
     ) -> None:
-        if layout == "":
+        if event.level.layout == "":
             raise ValueError("Tilemap layout cannot be empty")
 
-        self.layout = layout
+        self.layout = event.level.layout
 
         rows = self.layout.splitlines()
         self.width = len(rows[0])
@@ -48,31 +47,13 @@ class LevelView(ttk.Frame):
         self.tiles = []
         for y in range(self.height):
             for x in range(self.width):
-                tile = TileLabel(self.grid_frame, rows[y][x])
+                tile = TileLabel(
+                    self.grid_frame,
+                    rows[y][x],
+                    event.tile_instance_events[y * self.width + x],
+                )
                 tile.grid(column=x, row=y)
                 self.tiles.append(tile)
-
-        # TODO: Remove manual movement
-        self.bind_all("<w>", lambda _: events.MoveRequested(Direction.UP))
-        self.bind_all("<s>", lambda _: events.MoveRequested(Direction.DOWN))
-        self.bind_all("<a>", lambda _: events.MoveRequested(Direction.LEFT))
-        self.bind_all("<d>", lambda _: events.MoveRequested(Direction.RIGHT))
-
-    def get_tile(self, x: int, y: int) -> TileLabel | None:
-        try:
-            assert 0 <= x < self.width
-            assert 0 <= y < self.height
-            return self.tiles[y * self.width + x]
-        except (AssertionError, IndexError):
-            return None
-
-    def move_tile(self, x: int, y: int, direction: Direction) -> None:
-        from_tile = self.get_tile(x, y)
-        to_tile = self.get_tile(x + direction.x, y + direction.y)
-
-        if from_tile is not None and to_tile is not None and to_tile.tile_type.walkable:
-            to_tile.set_tile_type(from_tile.tile_type)
-            from_tile.set_tile_type(TileType.EMPTY)
 
     def update_tile_size(self) -> None:
         padding = int(str(self.cget("padding")[0])) # TODO: clean up this weird conversion issue

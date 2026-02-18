@@ -6,7 +6,6 @@ Contributors:
 """
 
 import logging
-from pathlib import Path
 import tkinter as tk
 
 import ttkbootstrap as ttk
@@ -23,26 +22,24 @@ class LevelManager(ttk.Frame):
     def __init__(self, master: tk.Misc, **kwargs) -> None:
         super().__init__(master, **kwargs)
 
-        self.level_select: LevelSelect | None = None
         self.level_player: LevelPlayer | None = None
+        self.level_select: LevelSelect | None = None
 
-        events.LevelSelected.connect(self._on_level_selected)
-        events.LevelSelectButtonPressed.connect(self._on_level_select_button_pressed)
+        events.LevelClosed.connect(self._on_level_closed)
+        events.LevelOpened.connect(self.open_level_player)
 
         self.open_level_select()
 
-    def open_level(self, level_path: Path) -> None:
-        logger.debug(f"Opening level '{level_path}'")
+    def open_level_player(self, event: events.LevelOpened) -> None:
+        logger.debug(f"Opening level player for '{event.level.name}'")
 
         if self.level_select is not None:
             self.level_select.pack_forget()
             self.level_select.destroy()
             self.level_select = None
 
-        self.level_player = LevelPlayer(self, level_path)
+        self.level_player = LevelPlayer(self, event)
         self.level_player.pack(anchor=ttkc.CENTER, fill=ttkc.BOTH, expand=True)
-
-        events.LevelOpened(self.level_player.level)
 
     def open_level_select(self) -> None:
         logger.debug(f"Opening level select")
@@ -57,8 +54,5 @@ class LevelManager(ttk.Frame):
 
         events.LevelSelectOpened()
 
-    def _on_level_selected(self, event: events.LevelSelected) -> None:
-        self.open_level(event.path)
-
-    def _on_level_select_button_pressed(self, _event: events.LevelSelectButtonPressed) -> None:
+    def _on_level_closed(self, _event: events.LevelClosed) -> None:
         self.open_level_select()

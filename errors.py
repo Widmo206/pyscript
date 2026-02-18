@@ -6,9 +6,6 @@ Contributors:
     Widmo
 """
 
-from yaml.parser import ParserError
-
-
 class EditorTabCreationError(ValueError):
     """Raised when trying to create an editor tab from an invalid file."""
     pass

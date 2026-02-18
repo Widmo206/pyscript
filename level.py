@@ -25,7 +25,7 @@ class Level:
 
     name: str = ""
     pyscript_path: Path | None = None
-    tilemap_layout: str = "P"
+    layout: str = "P"
 
     @classmethod
     def from_path(cls, path: Path) -> Level:
@@ -59,9 +59,9 @@ class Level:
             pyscript_path = None
 
         try:
-            tilemap_layout = data["tilemap_layout"]
+            layout = data["layout"]
         except KeyError:
-            logger.error(f"Missing field 'tilemap_layout' in '{path}'")
-            tilemap_layout = "P"
+            logger.error(f"Missing field 'layout' in '{path}'")
+            layout = "P"
 
-        return cls(name, pyscript_path, tilemap_layout)
+        return cls(name, pyscript_path, layout)

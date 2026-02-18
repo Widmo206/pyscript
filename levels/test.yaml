@@ -1,6 +1,6 @@
 name: "Test"
 pyscript_path: "pyscript/test.pyscript"
-tilemap_layout: |-
+layout: |-
   GOOOO
   XXXXO
   OOOXO

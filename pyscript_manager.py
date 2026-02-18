@@ -9,7 +9,6 @@ import logging
 import tkinter as tk
 
 import ttkbootstrap as ttk
-import ttkbootstrap.constants as ttkc
 
 from editor import Editor
 from output import Output

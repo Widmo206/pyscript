@@ -14,7 +14,7 @@ import logging
 from pathlib import Path
 from typing import Callable, ClassVar
 
-from enums import Direction
+from enums import Direction, TileType
 from level import Level
 
 logger = logging.getLogger(__name__)
@@ -24,11 +24,11 @@ class Event:
     """Base type for all events.
 
     Works almost exactly like Godot signals.
-    """
 
-    # We annotate with Self instead of __future__ annotations
-    # because Event is too general while Self takes the form of the event subclass.
-    # Nevermind, Self is python 3.11+ only, general Event it isssss.
+    We annotate with Self instead of __future__ annotations because
+    Event is too general while Self takes the form of the event subclass.
+    Nevermind, Self is python 3.11+ only, general Event it isssss.
+    """
     _listeners: ClassVar[list[Callable[[Event], None]]]
 
     def __init_subclass__(cls) -> None:
@@ -77,13 +77,14 @@ class ExitRequested(Event):
 
 
 @dataclass(frozen=True, slots=True)
-class LayoutChanged(Event):
-    layout: str
+class LevelClosed(Event):
+    pass
 
 
 @dataclass(frozen=True, slots=True)
 class LevelOpened(Event):
     level: Level
+    tile_instance_events: tuple[TileTypeChanged, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -115,3 +116,9 @@ class RunButtonPressed(Event):
 @dataclass(frozen=True, slots=True)
 class RunRequested(Event):
     path: Path
+
+
+@dataclass(frozen=True, slots=True)
+class TileTypeChanged(Event):
+    tile_type: TileType
+

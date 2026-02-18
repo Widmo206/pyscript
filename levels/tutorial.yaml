@@ -1,6 +1,6 @@
 name: "Tutorial"
 pyscript_path: "pyscript/tutorial.pyscript"
-tilemap_layout: |-
+layout: |-
   G
   O
   P

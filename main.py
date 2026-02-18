@@ -6,21 +6,40 @@ Contributors:
     Widmo
 """
 
+# TODO: Annotate all instance attributes
+
 import logging
 
 from common import SOLUTIONS_DIR
 import events
 from interface import Interface
+from level_model import LevelModel
 from parser import FunctionHolder, Parser
 
 
-def main() -> None:
-    SOLUTIONS_DIR.mkdir(parents=True, exist_ok=True)
+class Main:
+    def __init__(self) -> None:
+        SOLUTIONS_DIR.mkdir(parents=True, exist_ok=True)
 
-    events.RunRequested.connect(_on_run_requested)
+        events.LevelSelectButtonPressed.connect(self._on_level_select_button_pressed)
+        events.LevelSelected.connect(self._on_level_selected)
+        events.RunRequested.connect(self._on_run_requested)
 
-    interface = Interface()
-    interface.mainloop()
+        self.level_model: LevelModel | None = None
+
+        self.interface = Interface()
+        self.interface.mainloop()
+
+    def _on_level_select_button_pressed(self, _event: events.LevelSelectButtonPressed) -> None:
+        self.level_model.destroy()
+        self.level_model = None
+
+    def _on_level_selected(self, event: events.LevelSelected) -> None:
+        self.level_model = LevelModel(event.path)
+
+    def _on_run_requested(self, event: events.RunRequested) -> None:
+        self.parser = Parser(FunctionHolder(), event.path)
+        print(self.parser.tokenize())
 
 
 def setup_logging() -> None:
@@ -35,14 +54,9 @@ def setup_logging() -> None:
     logging.getLogger("PIL.PngImagePlugin").setLevel(logging.WARNING)
 
 
-def _on_run_requested(event: events.RunRequested) -> None:
-    parser = Parser(FunctionHolder(), event.path)
-    print(parser.tokenize())
-
-
 if __name__ == "__main__":
     setup_logging()
-    main()
+    Main()
 
 # Removed the "else raise RuntimeError" block,
 # ChatGPT said "This is not idiomatic Python and will bite you later."

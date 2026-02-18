@@ -7,12 +7,16 @@ Contributors:
 
 from __future__ import annotations
 from enum import auto, Enum
+import logging
 from pathlib import Path
 from PIL import Image
+from PIL.Image import Image as PILImage
 from typing import NamedTuple
 
 from common import print_enum
 from errors import UnknownTileTypeError
+
+logger = logging.getLogger(__name__)
 
 
 class DirectionMixin(NamedTuple):
@@ -41,6 +45,10 @@ class TileType(Enum):
     LOCK    = ("L", Path("sprites/tile_background.png"), None, False)
     ENEMY   = ("E", Path("sprites/tile_background.png"), None, False)
 
+    character: str
+    image: PILImage | None
+    is_walkable: bool
+
     def __new__(
         cls,
         character: str,
@@ -65,6 +73,17 @@ class TileType(Enum):
         obj.is_walkable = is_walkable
 
         return obj
+
+    @classmethod
+    def normalize(cls, value: TileType | str) -> TileType:
+        """Safely convert a TileType or character string to a TileType."""
+        if isinstance(value, cls):
+            return value
+        try:
+            return TileType(value)
+        except UnknownTileTypeError:
+            logger.error(f"No tile type matching value '{value}'")
+            return TileType.EMPTY
 
     @classmethod
     def _missing_(cls, value: object) -> TileType:

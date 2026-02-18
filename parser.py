@@ -15,6 +15,9 @@ from enums import TokenType
 from errors import UnknownTokenError
 
 logger = logging.getLogger(__name__)
+REFERENCE_CHARS = ascii_letters + digits + "_"
+REFERENCE_START_CHARS = ascii_letters + "_"
+SINGLE_COMMENT = "#"
 ESCAPE_CHAR = "\\"
 QUOTES = "\"'"
 KEYWORDS = (
@@ -186,16 +189,25 @@ class Parser(object):
             current_token = ""
             char = self.file[c]
 
-            if char in whitespace:
-                if char == "\n":
-                    # TODO: store line numbers in tokens
-                    line += 1
+            if char == "\n":
+                # TODO: store line numbers in tokens
+                line += 1
+                c += 1
+
+            elif char in whitespace:
                 #logger.debug(f"Found whitespace at {c}")
                 c += 1
 
-            elif char in ascii_letters:
+            if char == SINGLE_COMMENT:
+                i = 1
+                while char != "\n":
+                    i += 1
+                    char = self.file[c]
+                c += i+1
+
+            elif char in REFERENCE_START_CHARS:
                 i = 0
-                while char in ascii_letters:
+                while char in REFERENCE_CHARS:
                     # get the rest of the token
                     current_token += char
                     i += 1
@@ -291,7 +303,12 @@ class Parser(object):
                 add_token(SINGLE_CHAR_TOKENS[char])
 
             else:
-                 raise UnknownTokenError(f"There are no tokens that start with '{char}' (line {line} in '{self.path}')")
+                if char == "\n":
+                    # TODO: store line numbers in tokens
+                    line += 1
+                    c += 1
+                else:
+                    raise UnknownTokenError(f"There are no tokens that start with {repr(char)} (line {line} in '{self.path}')")
             skip_operators = False
         logger.info(f"Finished tokenizing '{self.path}' into {len(tokens)} tokens")
         return tokens

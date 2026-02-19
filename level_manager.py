@@ -26,6 +26,9 @@ class LevelManager(ttk.Frame):
     def __init__(self, master: tk.Misc, **kwargs) -> None:
         super().__init__(master, **kwargs)
 
+        self.level_player = None
+        self.level_select = None
+
         events.LevelClosed.connect(self._on_level_closed)
         events.LevelOpened.connect(self._on_level_opened)
 

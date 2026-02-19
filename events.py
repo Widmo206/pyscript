@@ -41,7 +41,7 @@ class Event:
 
     @classmethod
     def disconnect(cls, callback: Callable[[Event], None]) -> None:
-        logger.debug(f"Disconnection method '{callback.__name__}' from event '{cls.__name__}'")
+        logger.debug(f"Disconnecting method '{callback.__name__}' from event '{cls.__name__}'")
         cls._listeners.remove(callback)
 
     def __post_init__(self) -> None:

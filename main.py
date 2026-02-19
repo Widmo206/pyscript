@@ -23,11 +23,15 @@ class Main:
     def __init__(self) -> None:
         SOLUTIONS_DIR.mkdir(parents=True, exist_ok=True)
 
+        self.interface = Interface()
+        self.level_model = None
+        self.parser = None
+
         events.LevelSelectButtonPressed.connect(self._on_level_select_button_pressed)
         events.LevelSelected.connect(self._on_level_selected)
         events.RunRequested.connect(self._on_run_requested)
 
-        self.interface = Interface()
+    def run(self) -> None:
         self.interface.mainloop()
 
     def _on_level_select_button_pressed(self, _event: events.LevelSelectButtonPressed) -> None:
@@ -56,4 +60,5 @@ def setup_logging() -> None:
 
 if __name__ == "__main__":
     setup_logging()
-    Main()
+    app = Main()
+    app.run()

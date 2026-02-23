@@ -61,7 +61,7 @@ class Editor(ttk.Notebook):
     ) -> None:
         for tab_id in self.tabs():
             if self.nametowidget(tab_id).path == path:
-                logger.debug(f"Creating new tab '{path.name}'")
+                logger.debug(f"Selecting open tab '{path.name}'")
                 self.select(tab_id)
                 return
 
@@ -73,23 +73,34 @@ class Editor(ttk.Notebook):
     def save(self) -> None:
         selected_tab = self.get_selected_tab()
         if selected_tab is None:
+            logger.warning("No selected tab to save")
             return
-
         if selected_tab.path is None:
             self.save_as()
-        elif selected_tab.path.absolute().is_relative_to(PROJECT_DIR):
+            return
+        if selected_tab.path.absolute().is_relative_to(PROJECT_DIR):
             logger.warning(f"Cannot overwrite built-in file '{selected_tab.path}'")
-        else:
-            logger.debug(f"Saving file '{selected_tab.path}'")
-            selected_tab.path.write_text(selected_tab.text.get("1.0", "end-1c"))
+            return
+
+        logger.debug(f"Saving tab to file '{selected_tab.path}'")
+        selected_tab.path.write_text(selected_tab.text.get("1.0", "end-1c"))
 
     def save_as(self) -> None:
         selected_tab = self.get_selected_tab()
         if selected_tab is None:
+            logger.warning("No selected tab to save")
+            return
+        path = ask_save_as_pyscript()
+        if path is None:
+            return
+        if path.absolute().is_relative_to(PROJECT_DIR):
+            logger.warning(f"Cannot overwrite built-in file '{path}'")
             return
 
-        print(ask_save_as_pyscript())
-        #TODO: Actually save the file and rename tab
+        logger.debug(f"Saving tab to file '{selected_tab.path}'")
+        path.write_text(selected_tab.text.get("1.0", "end-1c"))
+        selected_tab.path = path
+        self.tab(selected_tab, text=path.name)
 
     def _add_tab(
         self,
@@ -123,7 +134,10 @@ class Editor(ttk.Notebook):
 
         selected_tab = self.get_selected_tab()
         if selected_tab is None:
+            logger.warning("No selected tab to run")
+            return
+        if selected_tab.path is None:
+            logger.error("Cannot run tab without assigned path")
             return
 
-        if selected_tab.path is not None:
-            events.RunRequested(self.get_selected_tab().path)
+        events.RunRequested(self.get_selected_tab().path)

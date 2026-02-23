@@ -54,7 +54,8 @@ class FileMenuCommand(MenuCommandEnum):
 
 
 class EditMenuCommand(MenuCommandEnum):
-    pass
+    UNDO = ("Undo", events.UndoRequested, "Ctrl+Z", "<Control-z>")
+    REDO = ("Redo", events.RedoRequested, "Ctrl+Y", "<Control-y>")
 
 
 class ViewMenuCommand(MenuCommandEnum):

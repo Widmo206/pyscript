@@ -109,6 +109,11 @@ class MoveRequested(Event):
 
 
 @dataclass(frozen=True, slots=True)
+class RedoRequested(Event):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
 class RunButtonPressed(Event):
     pass
 
@@ -133,3 +138,8 @@ class ToggleFullscreenRequested(Event):
 @dataclass(frozen=True, slots=True)
 class TokenizingFinished(Event):
     tokens: list[Token]
+
+
+@dataclass(frozen=True, slots=True)
+class UndoRequested(Event):
+    pass

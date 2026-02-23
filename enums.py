@@ -41,9 +41,9 @@ class TileType(Enum):
     EMPTY   = ("O", Path("sprites/tile_background.png"), None, True)
     PLAYER  = ("P", Path("sprites/tile_background.png"), Path("sprites/player.png"), False)
     FLAG    = ("F", Path("sprites/tile_background.png"), Path("sprites/flag.png"), True)
-    KEY     = ("K", Path("sprites/tile_background.png"), None, True)
-    LOCK    = ("L", Path("sprites/tile_background.png"), None, False)
-    ENEMY   = ("E", Path("sprites/tile_background.png"), None, False)
+    KEY     = ("K", Path("sprites/tile_background.png"), Path("sprites/key.png"), True)
+    GATE    = ("G", Path("sprites/tile_background.png"), Path("sprites/gate.png"), False)
+    ENEMY   = ("E", Path("sprites/tile_background.png"), Path("sprites/enemy.png"), False)
 
     character: str
     image: PILImage | None

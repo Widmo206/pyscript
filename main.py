@@ -25,5 +25,4 @@ def setup_logging() -> None:
 
 if __name__ == "__main__":
     setup_logging()
-    app = App()
-    app.run()
+    App().run()

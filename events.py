@@ -124,10 +124,11 @@ class RunRequested(Event):
 
 
 @dataclass(frozen=True, slots=True)
-class TileTypeChanged(Event):
+class TileChanged(Event):
     x: int
     y: int
-    tile_type: TileType
+    tile_type: TileType | None = None
+    direction: Direction | None = None
 
 
 @dataclass(frozen=True, slots=True)

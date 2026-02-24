@@ -6,11 +6,11 @@ Contributors:
 """
 
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 import logging
 from pathlib import Path
 
-import yaml # pip install PyYAML
+import yaml
 from yaml.parser import ParserError
 
 logger = logging.getLogger(__name__)
@@ -23,9 +23,10 @@ class Level:
         Path("levels/tutorial.yaml"),
     )
 
-    name: str = ""
+    name: str = "Missing level name"
     pyscript_path: Path | None = None
-    layout: str = "P"
+    layout: str = ""
+    direction_layout: str = ""
 
     @classmethod
     def from_path(cls, path: Path) -> Level:
@@ -43,25 +44,18 @@ class Level:
             logger.error(error_message)
             return cls(error_message)
 
-        try:
-            name = data["name"]
-        except KeyError:
-            error_message = f"Missing field 'name' in '{path}'"
-            logger.error(error_message)
-            name = error_message
+        constructor_kwargs = {}
 
-        try:
-            pyscript_path = data["pyscript_path"]
-            if pyscript_path is not None:
-                pyscript_path = Path(pyscript_path)
-        except KeyError:
-            logger.error(f"Missing field 'pyscript_path' in '{path}'")
-            pyscript_path = None
+        for field in fields(cls):
+            try:
+                constructor_kwargs[field.name] = data.pop(field.name)
+            except KeyError:
+                logger.error(f"Missing field '{field.name}' in '{path}'")
 
-        try:
-            layout = data["layout"]
-        except KeyError:
-            logger.error(f"Missing field 'layout' in '{path}'")
-            layout = "P"
+        for key in data:
+            logger.warning(f"Found unexpected field '{key}' in '{path}'")
 
-        return cls(name, pyscript_path, layout)
+        if "pyscript_path" in constructor_kwargs:
+            constructor_kwargs["pyscript_path"] = Path(constructor_kwargs["pyscript_path"])
+
+        return cls(**constructor_kwargs)

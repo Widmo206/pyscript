@@ -21,6 +21,7 @@ class LevelModel:
     width: int
     height: int
     tile_types: list[TileType]
+    tile_directions: list[Direction]
 
     def __init__(self, path: Path) -> None:
         self.level = Level.from_path(path)
@@ -57,7 +58,7 @@ class LevelModel:
                     continue
                 match action.type:
                     case TileActionType.MOVE:
-                        # action.direction
+                        # action.tile_direction
                         if direction is None:
                             continue
                         self.move_tile(x, y, direction)
@@ -84,7 +85,7 @@ class LevelModel:
             return
 
         logger.debug(
-            "Moving tile '%s' from (%i, %i) in direction '%s' ('%s')",
+            "Moving tile '%s' from (%i, %i) in tile_direction '%s' ('%s')",
             from_tile_type.name,
             x,
             y,
@@ -112,7 +113,7 @@ class LevelModel:
     def set_tile_type(self, x: int, y: int, tile_type: TileType | str) -> None:
         tile_type = TileType.normalize(tile_type)
         self.tile_types[y * self.width + x] = tile_type
-        events.TileTypeChanged(x, y, tile_type)
+        events.TileChanged(x, y, tile_type)
 
     def _on_move_requested(self, event: events.MoveRequested) -> None:
         self.cycle(event.direction)

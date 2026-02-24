@@ -11,7 +11,6 @@ import logging
 from pathlib import Path
 from PIL import Image
 from PIL.Image import Image as PILImage
-from typing import NamedTuple
 
 from common import print_enum
 from errors import UnknownTileTypeError
@@ -19,16 +18,33 @@ from errors import UnknownTileTypeError
 logger = logging.getLogger(__name__)
 
 
-class DirectionMixin(NamedTuple):
+class Direction(Enum):
+    UP    = ("U", 0, -1, Image.Transpose.ROTATE_90)
+    DOWN  = ("D", 0, 1, Image.Transpose.ROTATE_270)
+    LEFT  = ("L", -1, 0, Image.Transpose.ROTATE_180)
+    RIGHT = ("R", 1, 0, None)
+
+    character: str
     x: int
     y: int
+    image_transpose: Image.Transpose | None
 
+    def __new__(
+        cls,
+        character: str,
+        x: int,
+        y: int,
+        image_transpose: Image.Transpose | None = None,
+    ) -> Direction:
+        obj = object.__new__(cls)
+        obj._value_ = character
 
-class Direction(DirectionMixin, Enum):
-    UP    = (0, -1)
-    DOWN  = (0, 1)
-    LEFT  = (-1, 0)
-    RIGHT = (1, 0)
+        obj.character = character
+        obj.x = x
+        obj.y = y
+        obj.image_transpose = image_transpose
+
+        return obj
 
 
 class TileActionType(Enum):

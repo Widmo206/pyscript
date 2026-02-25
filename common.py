@@ -69,3 +69,9 @@ def ask_save_as_pyscript() -> Path | None:
 def get_solution_path(path: Path) -> Path | None:
     logger.debug(f"Creating solution path for '{path.name}'")
     return SOLUTIONS_DIR / f"{path.stem}_solution{PYSCRIPT_EXTENSION}"
+
+def normalize_path(value: Path | str) -> Path:
+    """Safely convert a Path or string to a Path."""
+    if isinstance(value, Path):
+        return value
+    return Path(value)

@@ -13,18 +13,16 @@ import ttkbootstrap as ttk
 
 import events
 from level import Level
-from tile_label import TileLabel
+from tile_view import TileView
 
 logger = logging.getLogger(__name__)
 
 
 class LevelView(ttk.Frame):
     level: Level
-    width: int
-    height: int
 
     grid_frame: ttk.Frame
-    tile_labels: list[TileLabel]
+    tile_views: tuple[TileView]
 
     def __init__(
         self,
@@ -42,54 +40,48 @@ class LevelView(ttk.Frame):
         self.grid_frame.grid()
 
         self.level = level
-
-        if self.level.layout == "":
-            self.width = 0
-            self.height = 0
-            self.tile_labels = []
-        else:
-            rows = self.level.layout.splitlines()
-            self.width = len(rows[0])
-            self.height = len(rows)
-            self.tile_labels = []
-            for y in range(self.height):
-                for x in range(self.width):
-                    tile_label = TileLabel(self.grid_frame, rows[y][x])
-                    tile_label.grid(column=x, row=y)
-                    self.tile_labels.append(tile_label)
-
-            if any(len(row) != self.width for row in rows):
-                raise ValueError(f"Mismatched row length in tilemap layout\n{self.level.layout}")
+        self.tile_views = tuple(
+            TileView(self.grid_frame, tile_type, tile_direction)
+            for tile_type, tile_direction
+            in level.iter_tile_data()
+        )
+        for i, tile_view in enumerate(self.tile_views):
+            tile_view.grid(
+                column=i % self.level.width,
+                row=i // self.level.width,
+            )
 
         self.bind("<Configure>", lambda _: self.update_tile_size())
 
-        events.TileChanged.connect(self._on_model_tile_changed)
+        events.TileModelChanged.connect(self._on_tile_model_changed)
 
     def destroy(self) -> None:
-        events.TileChanged.disconnect(self._on_model_tile_changed)
+        events.TileModelChanged.disconnect(self._on_tile_model_changed)
         ttk.Frame.destroy(self)
 
-    def get_tile_label(self, x: int, y: int) -> TileLabel | None:
+    def get_tile_view(self, x: int, y: int) -> TileView | None:
         try:
-            return self.tile_labels[y * self.width + x]
-        except IndexError:
+            assert 0 <= x < self.level.width
+            assert 0 <= y < self.level.height
+            return self.tile_views[y * self.level.width + x]
+        except (AssertionError, IndexError):
             return None
 
     def update_tile_size(self) -> None:
         padding = int(str(self.cget("padding")[0])) # TODO: clean up this weird conversion issue
         tile_size = floor(min(
-            (self.winfo_width() - padding * 2) / self.width,
-            (self.winfo_height() - padding * 2) / self.height,
+            (self.winfo_width() - padding * 2) / self.level.width,
+            (self.winfo_height() - padding * 2) / self.level.height,
         ))
 
-        for tile in self.tile_labels:
-            tile.tile_config(tile_size=tile_size)
+        for tile_view in self.tile_views:
+            tile_view.tile_config(tile_size=tile_size)
 
-    def _on_model_tile_changed(self, event: events.TileChanged) -> None:
-        tile_label = self.get_tile_label(event.x, event.y)
+    def _on_tile_model_changed(self, event: events.TileModelChanged) -> None:
+        tile_view = self.get_tile_view(event.x, event.y)
 
-        if tile_label is None:
-            logger.error(f"No tile label at ({event.x}, {event.y})")
+        if tile_view is None:
+            logger.error(f"No tile view at ({event.x}, {event.y})")
             return
 
-        tile_label.tile_config(tile_type=event.tile_type, tile_direction=event.direction)
+        tile_view.tile_config(tile_type=event.tile_type, tile_direction=event.direction)

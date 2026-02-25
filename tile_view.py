@@ -1,4 +1,4 @@
-"""TileLabel class for display
+"""TileView class for tile image display
 
 Created on 2026.01.28
 Contributors:
@@ -17,7 +17,7 @@ import events
 logger = logging.getLogger(__name__)
 
 
-class TileLabel(ttk.Label):
+class TileView(ttk.Label):
     MIN_SIZE = 32
     PADDING_RATIO = 0.05
 
@@ -73,6 +73,3 @@ class TileLabel(ttk.Label):
             self.image_tk = ImageTk.PhotoImage(image)
 
         self.config(image=self.image_tk, padding=pad_size)
-
-    def _on_remote_tile_type_changed(self, event: events.TileChanged) -> None:
-        self.tile_config(tile_type=event.tile_type, tile_direction=event.direction)

@@ -5,115 +5,143 @@ Contributors:
     Romcode
 """
 
+from __future__ import annotations
+from dataclasses import dataclass
 import logging
 from pathlib import Path
 
-from enums import Direction, TileActionType, TileType
+from enums import Direction, TileAction, TileType
 import events
 from level import Level
-from tile_action import TileAction
+from tile_model import TileModel
 
 logger = logging.getLogger(__name__)
 
 
+@dataclass(frozen=True)
 class LevelModel:
     level: Level
-    width: int
-    height: int
-    tile_types: list[TileType]
-    tile_directions: list[Direction]
+    tile_models: tuple[TileModel]
 
-    def __init__(self, path: Path) -> None:
-        self.level = Level.from_path(path)
+    @classmethod
+    def from_path(cls, path: Path) -> LevelModel:
+        level = Level.from_path(path)
+        tile_models = tuple(
+            TileModel(tile_type, tile_direction)
+            for tile_type, tile_direction
+            in level.iter_tile_data()
+        )
 
-        if self.level.layout == "":
-            self.width = 0
-            self.height = 0
-            self.tile_types = []
-        else:
-            rows = self.level.layout.splitlines()
-            self.width = len(rows[0])
-            self.height = len(rows)
+        return cls(level, tile_models)
 
-            if any(len(row) != self.width for row in rows):
-                raise ValueError(f"Mismatched row length in tilemap layout\n{self.level.layout}")
-
-            self.tile_types = [TileType.normalize(character) for character in self.level.layout.replace("\n", "")]
-
-        events.MoveRequested.connect(self._on_move_requested)
-
+    def __post_init__(self) -> None:
+        events.PlayerTileActionRequested.connect(self._on_player_tile_action_requested)
         events.LevelOpened(self.level)
 
-    def cycle(self, direction: Direction) -> None:
+    def cycle(self, player_tile_action: TileAction | None = None) -> None:
         # TODO: Remove manual movement
-        actions = []
-        for y in range(self.height):
-            for x in range(self.width):
-                actions.append(self.get_tile_action(x, y))
+        actions = [
+            (
+                player_tile_action
+                if self.get_tile_model(x, y).tile_type == TileType.PLAYER
+                else self.get_tile_action(x, y)
+            )
+            for y in range(self.level.height)
+            for x in range(self.level.width)
+        ]
 
-        for y in range(self.height):
-            for x in range(self.width):
-                action = actions[y * self.width + x]
-                if action is None:
-                    continue
-                match action.type:
-                    case TileActionType.MOVE:
-                        # action.tile_direction
-                        if direction is None:
-                            continue
-                        self.move_tile(x, y, direction)
-                    case TileActionType.ATTACK:
+        for y in range(self.level.height):
+            for x in range(self.level.width):
+                action = actions[y * self.level.width + x]
+                tile_model = self.get_tile_model(x, y)
+
+                match action:
+                    case TileAction.MOVE_FORWARD:
+                        self.move_tile(x, y, tile_model.tile_direction)
+
+                    case TileAction.MOVE_BACK:
+                        self.move_tile(x, y, -tile_model.tile_direction)
+
+                    case TileAction.TURN_LEFT:
+                        self.tile_config(x, y, tile_direction=tile_model.tile_direction.rotate(False))
+
+                    case TileAction.TURN_RIGHT:
+                        self.tile_config(x, y, tile_direction=tile_model.tile_direction.rotate())
+
+                    case TileAction.ATTACK:
                         pass
+
                     case _:
                         pass
 
     def destroy(self) -> None:
-        events.MoveRequested.disconnect(self._on_move_requested)
+        events.PlayerTileActionRequested.disconnect(self._on_player_tile_action_requested)
         events.LevelClosed()
+
+    def get_tile_action(self, x: int, y: int) -> TileAction | None:
+        tile_model = self.get_tile_model(x, y)
+
+        if tile_model is None:
+            logger.error(f"No tile model at ({x}, {y})")
+            return None
+
+        if tile_model.tile_type == TileType.PLAYER:
+            # TODO: Implement action choice
+            return TileAction.MOVE_FORWARD
+        else:
+            return None
+
+    def get_tile_model(self, x: int, y: int) -> TileModel | None:
+        try:
+            assert 0 <= x < self.level.width
+            assert 0 <= y < self.level.height
+            return self.tile_models[y * self.level.width + x]
+        except (AssertionError, IndexError):
+            return None
 
     def move_tile(self, x: int, y: int, direction: Direction) -> None:
         to_x = x + direction.x
         to_y = y + direction.y
-        from_tile_type = self.get_tile_type(x, y)
-        to_tile_type = self.get_tile_type(to_x, to_y)
+        from_tile_model = self.get_tile_model(x, y)
+        to_tile_model = self.get_tile_model(to_x, to_y)
 
         if (
-            from_tile_type is None
-            or to_tile_type is None
-            or not to_tile_type.is_walkable
+            from_tile_model is None
+            or to_tile_model is None
+            or not to_tile_model.tile_type.is_walkable
         ):
             return
 
         logger.debug(
-            "Moving tile '%s' from (%i, %i) in tile_direction '%s' ('%s')",
-            from_tile_type.name,
+            "Moving tile '%s' from (%i, %i) in direction '%s' ('%s')",
+            from_tile_model.tile_type.name,
             x,
             y,
             direction.name,
-            to_tile_type.name,
+            to_tile_model.tile_type.name,
         )
-        self.set_tile_type(to_x, to_y, from_tile_type)
-        self.set_tile_type(x, y, TileType.EMPTY)
+        self.tile_config(to_x, to_y, from_tile_model.tile_type, from_tile_model.tile_direction)
+        self.tile_config(x, y, TileType.EMPTY, Direction.RIGHT)
 
-    def get_tile_action(self, x: int, y: int) -> TileAction | None:
-        if self.get_tile_type(x, y) == TileType.PLAYER:
-            # TODO: Implement action choice
-            return TileAction(TileActionType.MOVE, Direction.UP)
-        else:
-            return None
+    def tile_config(
+        self,
+        x: int,
+        y: int,
+        tile_type: TileType | str | None = None,
+        tile_direction: Direction | None = None,
+    ) -> None:
+        tile_model = self.get_tile_model(x, y)
 
-    def get_tile_type(self, x: int, y: int) -> TileType | None:
-        try:
-            assert 0 <= x < self.width
-            assert 0 <= y < self.height
-            return self.tile_types[y * self.width + x]
-        except (AssertionError, IndexError):
-            return None
+        if tile_model is None:
+            logger.error(f"No tile model at ({x}, {y})")
+            return
 
-    def set_tile_type(self, x: int, y: int, tile_type: TileType | str) -> None:
-        tile_type = TileType.normalize(tile_type)
-        self.tile_types[y * self.width + x] = tile_type
-        events.TileChanged(x, y, tile_type)
+        if tile_type is not None:
+            tile_model.tile_type = TileType.normalize(tile_type)
+        if tile_direction is not None:
+            tile_model.tile_direction = Direction.normalize(tile_direction)
 
-    def _on_move_requested(self, event: events.MoveRequested) -> None:
-        self.cycle(event.direction)
+        events.TileModelChanged(x, y, tile_type, tile_direction)
+
+    def _on_player_tile_action_requested(self, event: events.PlayerTileActionRequested) -> None:
+        self.cycle(event.tile_action)

@@ -13,7 +13,7 @@ from PIL import Image
 from PIL.Image import Image as PILImage
 
 from common import print_enum
-from errors import UnknownTileTypeError
+from errors import UnknownDirectionError, UnknownTileTypeError
 
 logger = logging.getLogger(__name__)
 
@@ -46,10 +46,47 @@ class Direction(Enum):
 
         return obj
 
+    @classmethod
+    def normalize(cls, value: Direction | str) -> Direction:
+        """Safely convert a Direction or character string to a Direction."""
+        if isinstance(value, cls):
+            return value
+        try:
+            return Direction(value)
+        except UnknownDirectionError:
+            logger.error(f"No direction matching value '{value}'")
+            return cls.RIGHT
 
-class TileActionType(Enum):
-    MOVE   = auto()
-    ATTACK = auto
+    @classmethod
+    def _missing_(cls, value: object) -> Direction:
+        raise UnknownDirectionError(f"No direction matching value '{value}'")
+
+    def __neg__(self) -> Direction:
+        for direction in Direction:
+            if direction.x == -self.x and direction.y == -self.y:
+                return direction
+
+        raise ValueError("Invalid direction negation")
+
+    def rotate(self, clockwise: bool = True) -> Direction:
+        if clockwise:
+            new_x, new_y = -self.y, self.x
+        else:
+            new_x, new_y = self.y, -self.x
+
+        for direction in Direction:
+            if direction.x == new_x and direction.y == new_y:
+                return direction
+
+        raise ValueError("Invalid direction rotation")
+
+
+class TileAction(Enum):
+    MOVE_FORWARD = auto()
+    MOVE_BACK    = auto()
+    TURN_LEFT    = auto()
+    TURN_RIGHT   = auto()
+    ATTACK       = auto()
 
 
 class TileType(Enum):
@@ -99,7 +136,7 @@ class TileType(Enum):
             return TileType(value)
         except UnknownTileTypeError:
             logger.error(f"No tile type matching value '{value}'")
-            return TileType.EMPTY
+            return cls.EMPTY
 
     @classmethod
     def _missing_(cls, value: object) -> TileType:
@@ -134,6 +171,7 @@ class TokenType(Enum):
 def _test() -> None:
     for enum in (
         Direction,
+        TileAction,
         TileType,
         TokenType,
     ):

@@ -14,7 +14,7 @@ import logging
 from pathlib import Path
 from typing import Callable, ClassVar
 
-from enums import Direction, TileType
+from enums import Direction, TileAction, TileType
 from level import Level
 from pyscript_token import Token
 
@@ -37,17 +37,29 @@ class Event:
 
     @classmethod
     def connect(cls, callback: Callable[[Event], None]) -> None:
-        logger.debug(f"Connecting method '{callback.__name__}' to event '{cls.__name__}'")
+        logger.debug(
+            "Connecting method '%s' to event '%s'",
+            callback.__name__,
+            cls.__name__,
+        )
         cls._listeners.append(callback)
 
     @classmethod
     def disconnect(cls, callback: Callable[[Event], None]) -> None:
-        logger.debug(f"Disconnecting method '{callback.__name__}' from event '{cls.__name__}'")
+        logger.debug(
+            "Disconnecting method '%s' from event '%s'",
+            callback.__name__,
+            cls.__name__,
+        )
         cls._listeners.remove(callback)
 
     def __post_init__(self) -> None:
         cls = type(self)
-        logger.debug(f"Emitting event '{cls.__name__}' to {len(cls._listeners)} listener(s)")
+        logger.debug(
+            "Emitting %r to %d listener(s)",
+            self,
+            len(cls._listeners),
+        )
         for callback in cls._listeners:
             callback(self)
 
@@ -102,10 +114,9 @@ class LevelSelectOpened(Event):
     pass
 
 
-# TODO: Remove manual movement
 @dataclass(frozen=True, slots=True)
-class MoveRequested(Event):
-    direction: Direction
+class PlayerTileActionRequested(Event):
+    tile_action: TileAction
 
 
 @dataclass(frozen=True, slots=True)
@@ -124,7 +135,7 @@ class RunRequested(Event):
 
 
 @dataclass(frozen=True, slots=True)
-class TileChanged(Event):
+class TileModelChanged(Event):
     x: int
     y: int
     tile_type: TileType | None = None

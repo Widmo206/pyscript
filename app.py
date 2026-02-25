@@ -36,7 +36,7 @@ class App:
         self.level_model = None
 
     def _on_level_selected(self, event: events.LevelSelected) -> None:
-        self.level_model = LevelModel(event.path)
+        self.level_model = LevelModel.from_path(event.path)
 
     def _on_run_requested(self, event: events.RunRequested) -> None:
         self.parser = Parser(FunctionHolder(), event.path)

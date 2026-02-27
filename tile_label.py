@@ -1,4 +1,4 @@
-"""TileView class for tile image display
+"""TileLabel class for tile image display
 
 Created on 2026.01.28
 Contributors:
@@ -17,7 +17,7 @@ import events
 logger = logging.getLogger(__name__)
 
 
-class TileView(ttk.Label):
+class TileLabel(ttk.Label):
     MIN_SIZE = 32
     PADDING_RATIO = 0.05
 

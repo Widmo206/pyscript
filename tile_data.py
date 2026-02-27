@@ -1,4 +1,4 @@
-"""TileModel class for managing tile data
+"""TileData class for managing tile data
 
 Created on 2026.02.25
 Contributors:
@@ -11,7 +11,7 @@ from enums import Direction, TileType
 
 
 @dataclass
-class TileModel:
+class TileData:
     tile_type: TileType = TileType.EMPTY
     tile_direction: Direction = Direction.RIGHT
 

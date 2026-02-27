@@ -9,14 +9,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 import logging
 from pathlib import Path
-from typing import Iterator
 
 import yaml
 from yaml.parser import ParserError
 
 from common import normalize_path
-from enums import Direction, TileType
 from errors import InvalidLayoutError
+from matrix import Matrix
+from tile_data import TileData
 
 logger = logging.getLogger(__name__)
 
@@ -70,8 +70,9 @@ class Level:
 
         return cls(**constructor_kwargs)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         def raise_dimension_mismatch() -> None:
+            # Commonly used error message
             raise InvalidLayoutError(
                 "Mismatched dimensions in layout\n%s\n and direction layout\n%s",
                 self.layout,
@@ -112,12 +113,16 @@ class Level:
         ):
             raise_dimension_mismatch()
 
-    def iter_tile_data(self) -> Iterator[tuple[TileType, Direction]]:
-        return (
-            (TileType.normalize(type_char), Direction.normalize(direction_char))
-            for type_char, direction_char
-            in zip(
-                self.layout.replace("\n", ""),
-                self.direction_layout.replace("\n", ""),
+    def get_tile_data_matrix(self) -> Matrix[TileData]:
+        return Matrix(
+            self.width,
+            self.height,
+            (
+                TileData(type_char, direction_char)
+                for type_char, direction_char
+                in zip(
+                    self.layout.replace("\n", ""),
+                    self.direction_layout.replace("\n", ""),
+                )
             )
         )

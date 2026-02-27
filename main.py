@@ -26,3 +26,5 @@ def setup_logging() -> None:
 if __name__ == "__main__":
     setup_logging()
     App().run()
+
+# TODO: Replace all logging f-strings with % formatting. (source: Kessler said it was a bit faster)

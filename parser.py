@@ -11,10 +11,12 @@ from string import ascii_letters, digits, whitespace
 from pathlib import Path
 from typing import Callable, Type, Any
 
-from enums import TokenType
+from enums import TileAction, TileType, TokenType
 from errors import UnknownTokenError
 import events
+from matrix import Matrix
 from pyscript_token import Token
+from tile_data import TileData
 
 logger = logging.getLogger(__name__)
 REFERENCE_CHARS = ascii_letters + digits + "_"
@@ -135,8 +137,30 @@ class Processor(object):
         self.program = program
         self.stack = []
 
-    def run(self):
-        ...
+        events.ProcessorAdvanceRequested.connect(self._on_advance_requested)
+
+    def advance(
+        self,
+        player_x: int,
+        player_y: int,
+        tile_data: Matrix[TileData],
+    ) -> None:
+        # Keeping possibility for multiple player tiles,
+        # that should all succeed with the same code to force versatility.
+        if tile_data.get(player_x, player_y).tile_type != TileType.PLAYER:
+            raise ValueError("Mismatch between provided player coordinates and tile data")
+
+        # TODO: Advance program based on level state, block at next player action and emit its event.
+
+        events.ProcessorAdvanced(TileAction.MOVE_FORWARD)
+        # TileAction.MOVE_BACK
+        # TileAction.TURN_LEFT
+        # TileAction.TURN_RIGHT
+        # TileAction.ATTACK
+        # None (idle)
+
+    def _on_advance_requested(self, event: events.ProcessorAdvanceRequested) -> None:
+        self.advance(event.player_x, event.player_y, event.tile_data)
 
 
 @dataclass

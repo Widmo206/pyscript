@@ -16,7 +16,9 @@ from typing import Callable, ClassVar
 
 from enums import Direction, TileAction, TileType
 from level import Level
+from matrix import Matrix
 from pyscript_token import Token
+from tile_data import TileData
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +58,7 @@ class Event:
     def __post_init__(self) -> None:
         cls = type(self)
         logger.debug(
-            "Emitting %r to %d listener(s)",
+            "Emitting event %r to %d listener(s)",
             self,
             len(cls._listeners),
         )
@@ -115,8 +117,15 @@ class LevelSelectOpened(Event):
 
 
 @dataclass(frozen=True, slots=True)
-class PlayerTileActionRequested(Event):
-    tile_action: TileAction
+class ProcessorAdvanced(Event):
+    player_tile_action: TileAction | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class ProcessorAdvanceRequested(Event):
+    player_x: int
+    player_y: int
+    tile_data: Matrix[TileData]
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,7 +144,7 @@ class RunRequested(Event):
 
 
 @dataclass(frozen=True, slots=True)
-class TileModelChanged(Event):
+class TileDataChanged(Event):
     x: int
     y: int
     tile_type: TileType | None = None

@@ -13,7 +13,8 @@ import ttkbootstrap as ttk
 
 import events
 from level import Level
-from tile_view import TileView
+from matrix import Matrix
+from tile_label import TileLabel
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,7 @@ class LevelView(ttk.Frame):
     level: Level
 
     grid_frame: ttk.Frame
-    tile_views: tuple[TileView]
+    tile_labels: Matrix[TileLabel]
 
     def __init__(
         self,
@@ -40,32 +41,30 @@ class LevelView(ttk.Frame):
         self.grid_frame.grid()
 
         self.level = level
-        self.tile_views = tuple(
-            TileView(self.grid_frame, tile_type, tile_direction)
-            for tile_type, tile_direction
-            in level.iter_tile_data()
+
+        tile_data_matrix = level.get_tile_data_matrix()
+        self.tile_labels = Matrix(
+            tile_data_matrix.width,
+            tile_data_matrix.height,
+            (
+                TileLabel(
+                    self.grid_frame,
+                    tile_data.tile_type,
+                    tile_data.tile_direction,
+                ) for tile_data in tile_data_matrix
+            ),
         )
-        for i, tile_view in enumerate(self.tile_views):
-            tile_view.grid(
-                column=i % self.level.width,
-                row=i // self.level.width,
-            )
+
+        for x, y, tile_label in self.tile_labels.iter_xy():
+            tile_label.grid(column=x, row=y)
 
         self.bind("<Configure>", lambda _: self.update_tile_size())
 
-        events.TileModelChanged.connect(self._on_tile_model_changed)
+        events.TileDataChanged.connect(self._on_tile_model_changed)
 
     def destroy(self) -> None:
-        events.TileModelChanged.disconnect(self._on_tile_model_changed)
+        events.TileDataChanged.disconnect(self._on_tile_model_changed)
         ttk.Frame.destroy(self)
-
-    def get_tile_view(self, x: int, y: int) -> TileView | None:
-        try:
-            assert 0 <= x < self.level.width
-            assert 0 <= y < self.level.height
-            return self.tile_views[y * self.level.width + x]
-        except (AssertionError, IndexError):
-            return None
 
     def update_tile_size(self) -> None:
         padding = int(str(self.cget("padding")[0])) # TODO: clean up this weird conversion issue
@@ -74,14 +73,14 @@ class LevelView(ttk.Frame):
             (self.winfo_height() - padding * 2) / self.level.height,
         ))
 
-        for tile_view in self.tile_views:
-            tile_view.tile_config(tile_size=tile_size)
+        for tile_label in self.tile_labels:
+            tile_label.tile_config(tile_size=tile_size)
 
-    def _on_tile_model_changed(self, event: events.TileModelChanged) -> None:
-        tile_view = self.get_tile_view(event.x, event.y)
-
-        if tile_view is None:
+    def _on_tile_model_changed(self, event: events.TileDataChanged) -> None:
+        try:
+            tile_label = self.tile_labels.get(event.x, event.y)
+        except IndexError:
             logger.error(f"No tile view at ({event.x}, {event.y})")
             return
 
-        tile_view.tile_config(tile_type=event.tile_type, tile_direction=event.direction)
+        tile_label.tile_config(tile_type=event.tile_type, tile_direction=event.direction)

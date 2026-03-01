@@ -3,6 +3,7 @@
 Created on 2026.01.14
 Contributors:
     Widmo
+    (Romcode)
 """
 
 from dataclasses import dataclass
@@ -11,7 +12,7 @@ from string import ascii_letters, digits, whitespace
 from pathlib import Path
 from typing import Callable, Type, Any
 
-from enums import TileAction, TileType, TokenType
+from enums import TileAction, TokenType
 from errors import UnknownTokenError
 import events
 from matrix import Matrix
@@ -137,30 +138,30 @@ class Processor(object):
         self.program = program
         self.stack = []
 
-        events.ProcessorAdvanceRequested.connect(self._on_advance_requested)
-
     def advance(
         self,
-        player_x: int,
-        player_y: int,
-        tile_data: Matrix[TileData],
-    ) -> None:
+        processor_x: int,
+        processor_y: int,
+        tile_data_matrix: Matrix[TileData],
+    ) -> TileAction | None:
         # Keeping possibility for multiple player tiles,
         # that should all succeed with the same code to force versatility.
-        if tile_data.get(player_x, player_y).tile_type != TileType.PLAYER:
-            raise ValueError("Mismatch between provided player coordinates and tile data")
+        # One processor per player tile, to keep variables separate.
+        logger.debug(
+            "Advancing processor for tile %s at (%s, %s)",
+            tile_data_matrix.get(processor_x, processor_y).tile_type,
+            processor_x,
+            processor_y
+        )
 
-        # TODO: Advance program based on level state, block at next player action and emit its event.
+        # TODO: Advance program based on level state, block at next player action and return it.
 
-        events.ProcessorAdvanced(TileAction.MOVE_FORWARD)
+        return TileAction.MOVE_FORWARD
         # TileAction.MOVE_BACK
         # TileAction.TURN_LEFT
         # TileAction.TURN_RIGHT
         # TileAction.ATTACK
         # None (idle)
-
-    def _on_advance_requested(self, event: events.ProcessorAdvanceRequested) -> None:
-        self.advance(event.player_x, event.player_y, event.tile_data)
 
 
 @dataclass
@@ -377,3 +378,5 @@ if __name__ == "__main__":
     print(tokenized)
     parsed = parser.parse(tokenized)
     print(parsed)
+
+# TODO: Please refactor into one file per class.

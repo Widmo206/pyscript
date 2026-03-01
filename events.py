@@ -14,9 +14,7 @@ import logging
 from pathlib import Path
 from typing import Callable, ClassVar
 
-from enums import Direction, TileAction, TileType
 from level import Level
-from matrix import Matrix
 from pyscript_token import Token
 from tile_data import TileData
 
@@ -64,6 +62,11 @@ class Event:
         )
         for callback in cls._listeners:
             callback(self)
+
+
+@dataclass(frozen=True, slots=True)
+class CycleRequested(Event):
+    pass
 
 
 @dataclass(frozen=True, slots=True)
@@ -117,18 +120,6 @@ class LevelSelectOpened(Event):
 
 
 @dataclass(frozen=True, slots=True)
-class ProcessorAdvanced(Event):
-    player_tile_action: TileAction | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class ProcessorAdvanceRequested(Event):
-    player_x: int
-    player_y: int
-    tile_data: Matrix[TileData]
-
-
-@dataclass(frozen=True, slots=True)
 class RedoRequested(Event):
     pass
 
@@ -147,8 +138,7 @@ class RunRequested(Event):
 class TileDataChanged(Event):
     x: int
     y: int
-    tile_type: TileType | None = None
-    direction: Direction | None = None
+    tile_data: TileData
 
 
 @dataclass(frozen=True, slots=True)

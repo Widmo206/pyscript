@@ -11,15 +11,15 @@ from typing import Generic, Iterator, TypeVar
 T = TypeVar('T')
 
 
-@dataclass(frozen=True)
+@dataclass
 class Matrix(Generic[T]):
     width: int
     height: int
-    elements: tuple[T]
+    elements: list[T]
 
     def __post_init__(self) -> None:
-        # Bypass frozen dataclass to normalize data.
-        object.__setattr__(self, "elements", tuple(self.elements))
+        if not isinstance(self.elements, list):
+            self.elements = list(self.elements)
 
         if self.width <= 0 or self.height <= 0:
             raise ValueError("Matrix width and height must be positive")
@@ -50,6 +50,12 @@ class Matrix(Generic[T]):
             raise IndexError("Matrix indices out of range")
 
         return self.elements[y * self.width + x]
+
+    def set(self, x: int, y: int, value: T) -> None:
+        if x < 0 or x >= self.width or y < 0 or y >= self.height:
+            raise IndexError("Matrix indices out of range")
+
+        self.elements[y * self.width + x] = value
 
     def iter_xy(self) -> Iterator[tuple[int, int, T]]:
         # Equivalent of enumerate but 2D

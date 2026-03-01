@@ -11,7 +11,6 @@ import tkinter as tk
 import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
-from enums import TileAction
 import events
 from level_manager import LevelManager
 from menu_bar import MenuBar
@@ -75,12 +74,6 @@ class Interface(ttk.Window):
         self.update_idletasks()
         self.paned_window.sash_place(0, int(self.paned_window.winfo_width() * 0.5), 0)
         self.pyscript_manager.sash_place(0, 0, int(self.pyscript_manager.winfo_height() * 0.75))
-
-        # TODO: Remove manual movement
-        self.bind_all("<w>", lambda _: events.ProcessorAdvanced(TileAction.MOVE_FORWARD))
-        self.bind_all("<s>", lambda _: events.ProcessorAdvanced(TileAction.MOVE_BACK))
-        self.bind_all("<a>", lambda _: events.ProcessorAdvanced(TileAction.TURN_LEFT))
-        self.bind_all("<d>", lambda _: events.ProcessorAdvanced(TileAction.TURN_RIGHT))
 
         events.ExitRequested.connect(self._on_exit_requested)
         events.ToggleFullscreenRequested.connect(lambda _: self.toggle_fullscreen())

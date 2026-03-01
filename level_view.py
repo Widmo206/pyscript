@@ -47,11 +47,9 @@ class LevelView(ttk.Frame):
             tile_data_matrix.width,
             tile_data_matrix.height,
             (
-                TileLabel(
-                    self.grid_frame,
-                    tile_data.tile_type,
-                    tile_data.tile_direction,
-                ) for tile_data in tile_data_matrix
+                TileLabel(self.grid_frame, tile_data)
+                for tile_data
+                in tile_data_matrix
             ),
         )
 
@@ -60,10 +58,10 @@ class LevelView(ttk.Frame):
 
         self.bind("<Configure>", lambda _: self.update_tile_size())
 
-        events.TileDataChanged.connect(self._on_tile_model_changed)
+        events.TileDataChanged.connect(self._on_tile_data_changed)
 
     def destroy(self) -> None:
-        events.TileDataChanged.disconnect(self._on_tile_model_changed)
+        events.TileDataChanged.disconnect(self._on_tile_data_changed)
         ttk.Frame.destroy(self)
 
     def update_tile_size(self) -> None:
@@ -74,13 +72,13 @@ class LevelView(ttk.Frame):
         ))
 
         for tile_label in self.tile_labels:
-            tile_label.tile_config(tile_size=tile_size)
+            tile_label.set_tile_size(tile_size)
 
-    def _on_tile_model_changed(self, event: events.TileDataChanged) -> None:
+    def _on_tile_data_changed(self, event: events.TileDataChanged) -> None:
         try:
             tile_label = self.tile_labels.get(event.x, event.y)
         except IndexError:
-            logger.error(f"No tile view at ({event.x}, {event.y})")
+            logger.error(f"No tile label at ({event.x}, {event.y})")
             return
 
-        tile_label.tile_config(tile_type=event.tile_type, tile_direction=event.direction)
+        tile_label.set_tile_data(event.tile_data)

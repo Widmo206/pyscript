@@ -29,6 +29,9 @@ class Matrix(Generic[T]):
     def __getitem__(self, index: int) -> T:
         return self.elements[index]
 
+    def __setitem__(self, index: int, value: T) -> None:
+        self.elements[index] = value
+
     def __iter__(self) -> Iterator[T]:
         return iter(self.elements)
 
@@ -65,7 +68,7 @@ class Matrix(Generic[T]):
 
 
 def _test() -> None:
-    matrix: Matrix[int] = Matrix(3, 3, tuple(range(9)))
+    matrix: Matrix[int] = Matrix(3, 3, range(9))
     print(matrix)
 
 

@@ -27,12 +27,7 @@ class LevelModel:
     @classmethod
     def from_path(cls, path: Path) -> LevelModel:
         level = Level.from_path(path)
-        tile_data_matrix = level.get_tile_data_matrix()
-        tile_model_matrix = Matrix(
-            tile_data_matrix.width,
-            tile_data_matrix.height,
-            (TileModel(tile_data) for tile_data in tile_data_matrix),
-        )
+        tile_model_matrix = level.get_tile_data_matrix().map(TileModel)
 
         return cls(level, tile_model_matrix)
 
@@ -45,23 +40,11 @@ class LevelModel:
         events.LevelClosed()
 
     def cycle(self) -> None:
-        tile_data_matrix = Matrix(
-            self.tile_model_matrix.width,
-            self.tile_model_matrix.height,
-            (
-                tile_model.tile_data
-                for tile_model
-                in self.tile_model_matrix
-            ),
+        tile_data_matrix = self.tile_model_matrix.map(
+            lambda tile_model: tile_model.tile_data
         )
-        action_matrix = Matrix(
-            self.tile_model_matrix.width,
-            self.tile_model_matrix.height,
-            (
-                tile_model.get_action(x, y, tile_data_matrix)
-                for x, y, tile_model
-                in self.tile_model_matrix.iter_xy()
-            ),
+        action_matrix = self.tile_model_matrix.map_xy(
+            lambda x, y, tile_model: tile_model.get_action(x, y, tile_data_matrix)
         )
 
         for x, y, action in action_matrix.iter_xy():

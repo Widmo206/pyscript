@@ -23,7 +23,7 @@ class LevelView(ttk.Frame):
     level: Level
 
     grid_frame: ttk.Frame
-    tile_labels: Matrix[TileLabel]
+    tile_label_matrix: Matrix[TileLabel]
 
     def __init__(
         self,
@@ -42,18 +42,11 @@ class LevelView(ttk.Frame):
 
         self.level = level
 
-        tile_data_matrix = level.get_tile_data_matrix()
-        self.tile_labels = Matrix(
-            tile_data_matrix.width,
-            tile_data_matrix.height,
-            (
-                TileLabel(self.grid_frame, tile_data)
-                for tile_data
-                in tile_data_matrix
-            ),
+        self.tile_label_matrix = level.get_tile_data_matrix().map(
+            lambda tile_data: TileLabel(self.grid_frame, tile_data)
         )
 
-        for x, y, tile_label in self.tile_labels.iter_xy():
+        for x, y, tile_label in self.tile_label_matrix.iter_xy():
             tile_label.grid(column=x, row=y)
 
         self.bind("<Configure>", lambda _: self.update_tile_size())
@@ -71,12 +64,12 @@ class LevelView(ttk.Frame):
             (self.winfo_height() - padding * 2) / self.level.height,
         ))
 
-        for tile_label in self.tile_labels:
+        for tile_label in self.tile_label_matrix:
             tile_label.set_tile_size(tile_size)
 
     def _on_tile_data_changed(self, event: events.TileDataChanged) -> None:
         try:
-            tile_label = self.tile_labels.get(event.x, event.y)
+            tile_label = self.tile_label_matrix.get(event.x, event.y)
         except IndexError:
             logger.error(f"No tile label at ({event.x}, {event.y})")
             return

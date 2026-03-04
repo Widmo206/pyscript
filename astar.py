@@ -7,7 +7,7 @@ Contributors:
 
 from __future__ import annotations
 from dataclasses import dataclass
-from math import copysign, inf
+from math import inf
 
 from enums import Direction
 from matrix import Matrix
@@ -19,12 +19,19 @@ class Node:
     cost: int = 0
     parent: Node | None = None
 
+    def __str__(self) -> str:
+        return f"{self.direction.value}{str(self.cost).rjust(3)}"
+
     def get_future_cost(self, dx: int, dy: int) -> int:
         """Estimate the minimum amount of actions needed to reach target"""
-        sign_dx, sign_dy = copysign(1, dx), copysign(1, dy)
+        sign_dx = 0 if dx == 0 else (1 if dx > 0 else -1)
+        sign_dy = 0 if dy == 0 else (1 if dy > 0 else -1)
 
         move_cost = abs(dx) + abs(dy)
-        turn_cost = min(abs(self.direction.x - sign_dx) + abs(self.direction.y - sign_dy), 2)
+        turn_cost = max(
+            abs(self.direction.x - sign_dx),
+            abs(self.direction.y - sign_dy),
+        )
 
         return move_cost + turn_cost
 
@@ -59,9 +66,9 @@ def astar(
         # Choose most promising node.
         current_x, current_y, current_node = min(
             open_node_matrix.iter_xy(),
-            key=lambda x, y, node: inf if node is None else node.get_total_cost(
-                target_x - x,
-                target_y - y,
+            key=lambda xynode: inf if xynode[2] is None else xynode[2].get_total_cost(
+                target_x - xynode[0],
+                target_y - xynode[0],
             ),
         )
 
@@ -75,10 +82,11 @@ def astar(
         # Spread to neighboring nodes.
         for direction in Direction:
             neighbor_x, neighbor_y = current_x + direction.x, current_y + direction.y
-            if (
-                walkable_matrix.get(neighbor_x, neighbor_y)
-                and closed_node_matrix.get(neighbor_x, neighbor_y) is not None
-            ):
+            # Continue if neighbor is invalid, not walkable or already explored.
+            try:
+                assert walkable_matrix.get(neighbor_x, neighbor_y)
+                assert closed_node_matrix.get(neighbor_x, neighbor_y) is None
+            except (AssertionError, IndexError):
                 continue
 
             stored_neighbor_node = open_node_matrix.get(neighbor_x, neighbor_y)

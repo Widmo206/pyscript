@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 class Level:
     PATHS = (
         Path("levels/test.yaml"),
+        Path("levels/astar_test.yaml"),
         Path("levels/tutorial.yaml"),
     )
     YAML_FIELDS = (

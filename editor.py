@@ -86,7 +86,7 @@ class Editor(ttk.Notebook):
             return
         absolute_path = selected_tab.path.absolute()
         if absolute_path.is_relative_to(PROJECT_DIR):
-            message_error(f"Cannot overwrite built-in file '{absolute_path}'")
+            message_error("Cannot overwrite built-in file '%s'", absolute_path)
             return
 
         logger.debug(f"Saving tab to file '{selected_tab.path}'")
@@ -102,7 +102,7 @@ class Editor(ttk.Notebook):
             return
         absolute_path = selected_tab.path.absolute()
         if absolute_path.is_relative_to(PROJECT_DIR):
-            message_error(f"Cannot overwrite built-in file '{absolute_path}'")
+            message_error("Cannot overwrite built-in file '%s'", absolute_path)
             return
 
         logger.debug("Saving tab to file '%s'", selected_tab.path)
@@ -124,7 +124,7 @@ class Editor(ttk.Notebook):
                 text=name,
             )
         except EditorTabCreationError:
-            message_error(f"Failed to create tab '{name}'")
+            message_error("Failed to create tab '%s'", name)
             return
 
         self.select(self.tabs()[-1])

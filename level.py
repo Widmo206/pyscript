@@ -50,13 +50,13 @@ class Level:
             with open(path, "r", encoding="utf-8") as file:
                 data = yaml.safe_load(file)
         except FileNotFoundError:
-            error_message = f"Missing level file at '{path}'"
-            message_error(error_message)
-            return cls(error_message)
+            error_message = "Missing level file at '%s'"
+            message_error(error_message, path)
+            return cls(error_message % path)
         except ParserError:
-            error_message = f"Failed to parse level from '{path}'"
-            message_error(error_message)
-            return cls(error_message)
+            error_message = "Failed to parse level from '%s'"
+            message_error(error_message, path)
+            return cls(error_message % path)
 
         constructor_kwargs = {}
 
@@ -64,7 +64,7 @@ class Level:
             try:
                 constructor_kwargs[field] = data.pop(field)
             except KeyError:
-                message_error(f"Missing field '{field}' in '{path}'")
+                message_error("Missing field '%s' in '%s'", field, path)
 
         for field in data:
             logger.warning("Found unexpected field '%s' in '%s'", field, path)

@@ -72,19 +72,19 @@ def get_solution_path(path: Path) -> Path | None:
     return SOLUTIONS_DIR / f"{path.stem}_solution{PYSCRIPT_EXTENSION}"
 
 
-def message_info(message: str) -> None:
-    logger.info(message)
-    showinfo("Info", message)
+def message_info(message: str, *args) -> None:
+    logger.info(message, *args)
+    showinfo("Info", message % args)
 
 
-def message_error(message: str) -> None:
-    logger.error(message)
-    showerror("Error", message)
+def message_error(message: str, *args) -> None:
+    logger.error(message, *args)
+    showerror("Error", message % args)
 
 
-def message_warning(message: str) -> None:
-    logger.warning(message)
-    showwarning("Warning", message)
+def message_warning(message: str, *args) -> None:
+    logger.warning(message, *args)
+    showwarning("Warning", message % args)
 
 
 def normalize_path(value: Path | str) -> Path:

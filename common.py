@@ -6,11 +6,11 @@ Contributors:
 """
 
 from enum import Enum
-
 import logging
 from pathlib import Path
 import tkinter as tk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+from tkinter.messagebox import showinfo, showerror, showwarning
 from typing import Callable, Literal
 
 from platformdirs import user_data_dir
@@ -21,8 +21,8 @@ PYSCRIPT_EXTENSION = ".pyscript"
 
 PROJECT_DIR = Path.cwd()
 USER_DATA_DIR = Path(user_data_dir(APP_NAME, APP_AUTHOR))
-SOLUTIONS_DIR = USER_DATA_DIR / "solutions"
 SAVE_PATH = USER_DATA_DIR / "save.yaml"
+SOLUTIONS_DIR = USER_DATA_DIR / "solutions"
 
 FILE_DIALOG_OPTIONS = {
     "initialdir": SOLUTIONS_DIR,
@@ -70,6 +70,21 @@ def ask_save_as_pyscript() -> Path | None:
 def get_solution_path(path: Path) -> Path | None:
     logger.debug(f"Creating solution path for '{path.name}'")
     return SOLUTIONS_DIR / f"{path.stem}_solution{PYSCRIPT_EXTENSION}"
+
+
+def message_info(message: str) -> None:
+    logger.info(message)
+    showinfo("Info", message)
+
+
+def message_error(message: str) -> None:
+    logger.error(message)
+    showerror("Error", message)
+
+
+def message_warning(message: str) -> None:
+    logger.warning(message)
+    showwarning("Warning", message)
 
 
 def normalize_path(value: Path | str) -> Path:

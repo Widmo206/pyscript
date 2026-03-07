@@ -34,12 +34,10 @@ class LevelModel:
     def __post_init__(self) -> None:
         events.CycleRequested.connect(self._on_cycle_requested)
         events.RestartButtonPressed.connect(self._on_restart_button_pressed)
-        events.LevelOpened(self.level)
 
     def destroy(self) -> None:
         events.CycleRequested.disconnect(self._on_cycle_requested)
         events.RestartButtonPressed.disconnect(self._on_restart_button_pressed)
-        events.LevelClosed()
 
     def cycle(self) -> None:
         tile_data_matrix = self.tile_model_matrix.map(

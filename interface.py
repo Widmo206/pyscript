@@ -75,14 +75,9 @@ class Interface(ttk.Window):
         self.paned_window.sash_place(0, int(self.paned_window.winfo_width() * 0.5), 0)
         self.pyscript_manager.sash_place(0, 0, int(self.pyscript_manager.winfo_height() * 0.75))
 
-        events.ExitRequested.connect(self._on_exit_requested)
         events.ToggleFullscreenRequested.connect(lambda _: self.toggle_fullscreen())
 
     def toggle_fullscreen(self) -> None:
         new_mode = not self.attributes("-fullscreen")
         logger.debug(f"Setting fullscreen mode to {new_mode}")
         self.attributes("-fullscreen", new_mode)
-
-    def _on_exit_requested(self, _event: events.ExitRequested) -> None:
-        logger.debug("Exiting application")
-        self.destroy()

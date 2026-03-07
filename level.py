@@ -13,7 +13,7 @@ from pathlib import Path
 import yaml
 from yaml.parser import ParserError
 
-from common import normalize_path
+from common import message_error, normalize_path
 from errors import InvalidLayoutError
 from matrix import Matrix
 from tile_data import TileData
@@ -44,18 +44,18 @@ class Level:
 
     @classmethod
     def from_path(cls, path: Path) -> Level:
-        logger.debug(f"Loading level from '{path}'")
+        logger.debug("Loading level from '%s'", path)
 
         try:
             with open(path, "r", encoding="utf-8") as file:
                 data = yaml.safe_load(file)
         except FileNotFoundError:
             error_message = f"Missing level file at '{path}'"
-            logger.error(error_message)
+            message_error(error_message)
             return cls(error_message)
         except ParserError:
             error_message = f"Failed to parse level from '{path}'"
-            logger.error(error_message)
+            message_error(error_message)
             return cls(error_message)
 
         constructor_kwargs = {}
@@ -64,10 +64,10 @@ class Level:
             try:
                 constructor_kwargs[field] = data.pop(field)
             except KeyError:
-                logger.error(f"Missing field '{field}' in '{path}'")
+                message_error(f"Missing field '{field}' in '{path}'")
 
         for field in data:
-            logger.warning(f"Found unexpected field '{field}' in '{path}'")
+            logger.warning("Found unexpected field '%s' in '%s'", field, path)
 
         return cls(**constructor_kwargs)
 

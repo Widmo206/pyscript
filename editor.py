@@ -11,7 +11,13 @@ import tkinter as tk
 
 import ttkbootstrap as ttk
 
-from common import ask_open_pyscript, ask_save_as_pyscript, get_solution_path, PROJECT_DIR
+from common import (
+    ask_open_pyscript,
+    ask_save_as_pyscript,
+    get_solution_path,
+    message_error,
+    PROJECT_DIR,
+)
 from editor_tab import EditorTab
 from errors import EditorTabCreationError
 import events
@@ -61,7 +67,7 @@ class Editor(ttk.Notebook):
     ) -> None:
         for tab_id in self.tabs():
             if self.nametowidget(tab_id).path == path:
-                logger.debug(f"Selecting open tab '{path.name}'")
+                logger.debug("Selecting open tab '%s'", path.name)
                 self.select(tab_id)
                 return
 
@@ -73,13 +79,14 @@ class Editor(ttk.Notebook):
     def save(self) -> None:
         selected_tab = self.get_selected_tab()
         if selected_tab is None:
-            logger.warning("No selected tab to save")
+            message_error("No selected tab to save")
             return
         if selected_tab.path is None:
             self.save_as()
             return
-        if selected_tab.path.absolute().is_relative_to(PROJECT_DIR):
-            logger.warning(f"Cannot overwrite built-in file '{selected_tab.path}'")
+        absolute_path = selected_tab.path.absolute()
+        if absolute_path.is_relative_to(PROJECT_DIR):
+            message_error(f"Cannot overwrite built-in file '{absolute_path}'")
             return
 
         logger.debug(f"Saving tab to file '{selected_tab.path}'")
@@ -88,16 +95,17 @@ class Editor(ttk.Notebook):
     def save_as(self) -> None:
         selected_tab = self.get_selected_tab()
         if selected_tab is None:
-            logger.warning("No selected tab to save")
+            message_error("No selected tab to save")
             return
         path = ask_save_as_pyscript()
         if path is None:
             return
-        if path.absolute().is_relative_to(PROJECT_DIR):
-            logger.warning(f"Cannot overwrite built-in file '{path}'")
+        absolute_path = selected_tab.path.absolute()
+        if absolute_path.is_relative_to(PROJECT_DIR):
+            message_error(f"Cannot overwrite built-in file '{absolute_path}'")
             return
 
-        logger.debug(f"Saving tab to file '{selected_tab.path}'")
+        logger.debug("Saving tab to file '%s'", selected_tab.path)
         path.write_text(selected_tab.text.get("1.0", "end-1c"))
         selected_tab.path = path
         self.tab(selected_tab, text=path.name)
@@ -108,7 +116,7 @@ class Editor(ttk.Notebook):
         default_content_path: Path | None = None,
     ) -> None:
         name = path.name if path is not None else UNTITLED_TAB_NAME
-        logger.debug(f"Creating new tab '{name}'")
+        logger.debug("Creating new tab '%s'", name)
 
         try:
             self.add(
@@ -116,7 +124,7 @@ class Editor(ttk.Notebook):
                 text=name,
             )
         except EditorTabCreationError:
-            logger.error(f"Failed to create tab '{name}'")
+            message_error(f"Failed to create tab '{name}'")
             return
 
         self.select(self.tabs()[-1])
@@ -134,10 +142,10 @@ class Editor(ttk.Notebook):
 
         selected_tab = self.get_selected_tab()
         if selected_tab is None:
-            logger.warning("No selected tab to run")
+            message_error("No selected tab to run")
             return
         if selected_tab.path is None:
-            logger.error("Cannot run tab without assigned path")
+            message_error("Cannot run tab without assigned path")
             return
 
         events.RunRequested(self.get_selected_tab().path)

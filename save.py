@@ -48,3 +48,23 @@ class Save:
             message_error("Missing field 'level_scores' in '%s'", path)
 
         return cls()
+
+    def save(self, path: Path) -> None:
+        logger.debug("Saving save to '%s'", path)
+
+        data = {
+            "level_scores": {
+                str(level_path): {
+                    "solution_path": str(level_score.solution_path),
+                    "token_count": level_score.token_count,
+                }
+                for level_path, level_score
+                in self.level_scores.items()
+            }
+        }
+
+        try:
+            with open(path, "w", encoding="utf-8") as file:
+                yaml.safe_dump(data, file)
+        except OSError:
+            message_error("Failed to save to '%s'", path)

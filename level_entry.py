@@ -48,7 +48,7 @@ class LevelEntry(ttk.Frame):
             anchor=ttkc.CENTER,
             font=("Segoe UI", 16),
             padding=16,
-            bootstyle = (ttkc.PRIMARY, ttkc.INVERSE),
+            bootstyle=(ttkc.PRIMARY, ttkc.INVERSE),
         )
         self.number_label.grid(column=0, row=0, sticky=tk.NSEW)
 

@@ -13,7 +13,6 @@ from string import ascii_letters, digits, whitespace
 from pathlib import Path
 from typing import Callable, Type, Any
 
-from enums import TileAction, TokenType
 from enums import TileAction, TokenType, NodeType
 from errors import UnknownTokenError
 import events

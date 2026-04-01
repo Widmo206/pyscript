@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Callable, Type, Any
 
 from enums import TileAction, TokenType
+from enums import TileAction, TokenType, NodeType
 from errors import UnknownTokenError
 import events
 from matrix import Matrix
@@ -164,6 +165,35 @@ class Processor(object):
         # TileAction.ATTACK
         # None (idle)
 
+
+@dataclass
+class ProcessNode(object):
+    _parent: ProcessNode | None
+    _type: NodeType
+    _value: Any=None
+    _children: tuple[ProcessNode, ...] | None=None
+
+    def get_type(self) -> NodeType:
+        return self._type
+
+    def get_parent(self) -> ProcessNode | None:
+        return self._parent
+    
+    def has_children(self):
+        return self._children is None
+    
+    def get_children(self) -> tuple[ProcessNode, ...]:
+        if self._children is None:
+            return tuple()
+        else:
+            return self._children
+    
+    def add_child(self, node: ProcessNode):
+        if self._children is None:
+            self._children = (node,)
+        else:
+            self._children += (node,)
+    
 
 @dataclass
 class Parser(object):

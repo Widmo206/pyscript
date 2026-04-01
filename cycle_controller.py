@@ -32,12 +32,20 @@ class CycleController:
         events.CyclingStarted()
         self._cycle()
 
+    def restart(self) -> None:
+        if self.is_running:
+            self.stop()
+        events.RestartRequested()
+
     def step_back(self) -> None:
-        # TODO: ughhhh time travel
-        ...
+        if self.is_running:
+            self.stop()
+        events.StepBackRequested()
 
     def step_forward(self) -> None:
-        events.CycleRequested()
+        if self.is_running:
+            self.stop()
+        events.StepForwardRequested()
 
     def stop(self) -> None:
         self.scheduler.after_cancel(self.after_id)
@@ -49,19 +57,14 @@ class CycleController:
         if not self.is_running:
             return
 
-        self.step_forward()
+        events.StepForwardRequested()
         self.after_id = self.scheduler.after(250, self._cycle)
 
     def _on_restart_button_pressed(self, _event: events.RestartButtonPressed) -> None:
-        if self.is_running:
-            self.stop()
+        self.restart()
 
     def _on_step_back_button_pressed(self, _event: events.StepBackButtonPressed) -> None:
-        if self.is_running:
-            self.stop()
         self.step_back()
 
     def _on_step_forward_button_pressed(self, _event: events.StepForwardButtonPressed) -> None:
-        if self.is_running:
-            self.stop()
         self.step_forward()

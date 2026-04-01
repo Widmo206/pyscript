@@ -65,11 +65,6 @@ class Event:
 
 
 @dataclass(frozen=True, slots=True)
-class CycleRequested(Event):
-    pass
-
-
-@dataclass(frozen=True, slots=True)
 class CyclingStarted(Event):
     pass
 
@@ -145,6 +140,11 @@ class RestartButtonPressed(Event):
 
 
 @dataclass(frozen=True, slots=True)
+class RestartRequested(Event):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
 class RunButtonPressed(Event):
     pass
 
@@ -160,7 +160,17 @@ class StepBackButtonPressed(Event):
 
 
 @dataclass(frozen=True, slots=True)
+class StepBackRequested(Event):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
 class StepForwardButtonPressed(Event):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
+class StepForwardRequested(Event):
     pass
 
 

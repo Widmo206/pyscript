@@ -196,10 +196,21 @@ class ProcessNode(object):
     
 
 @dataclass
+class ProcessTree(object):
+    _root: ProcessNode
+
+    def __init__(self):
+        self._root = ProcessNode(None, NodeType.CLOSURE, None, None)
+    
+    def get_root(self):
+        return self._root
+
+
+@dataclass
 class Parser(object):
-    functions: FunctionHolder
-    variables: dict
-    constants: dict
+    # functions: FunctionHolder
+    # variables: dict
+    # constants: dict
     file: str
     path: Path
 
@@ -208,7 +219,7 @@ class Parser(object):
         fh: FunctionHolder,
         path: Path = Path("pyscript/test.pyscript")
     ):
-        self.functions = fh
+        # self.functions = fh
         with open(path, "rt") as file:
             self.file = file.read()
         self.path = path

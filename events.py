@@ -65,7 +65,7 @@ class Event:
 
 
 @dataclass(frozen=True, slots=True)
-class CycleRequested(Event):
+class Cycled(Event):
     pass
 
 
@@ -110,6 +110,11 @@ class LevelClosed(Event):
 
 
 @dataclass(frozen=True, slots=True)
+class LevelComplete(Event):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
 class LevelOpened(Event):
     level: Level
 
@@ -140,6 +145,11 @@ class RestartButtonPressed(Event):
 
 
 @dataclass(frozen=True, slots=True)
+class RestartRequested(Event):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
 class RunButtonPressed(Event):
     pass
 
@@ -155,7 +165,17 @@ class StepBackButtonPressed(Event):
 
 
 @dataclass(frozen=True, slots=True)
+class StepBackRequested(Event):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
 class StepForwardButtonPressed(Event):
+    pass
+
+
+@dataclass(frozen=True, slots=True)
+class StepForwardRequested(Event):
     pass
 
 

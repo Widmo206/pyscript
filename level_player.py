@@ -1,4 +1,4 @@
-"""LevelPlayer class that contains LevelBar and LevelView
+"""LevelPlayer class that contains LevelBottomBar and LevelView
 
 Created on 2026.02.05
 Contributors:
@@ -12,7 +12,8 @@ import ttkbootstrap as ttk
 import ttkbootstrap.constants as ttkc
 
 from level import Level
-from level_bar import LevelBar
+from level_bottom_bar import LevelBottomBar
+from level_top_bar import LevelTopBar
 from level_view import LevelView
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,8 @@ logger = logging.getLogger(__name__)
 class LevelPlayer(ttk.Frame):
     level: Level
 
-    level_bar: LevelBar
+    level_bottom_bar: LevelBottomBar
+    level_top_bar: LevelTopBar
     level_view: LevelView
 
     def __init__(
@@ -33,7 +35,7 @@ class LevelPlayer(ttk.Frame):
         super().__init__(master, **kwargs)
 
         self.columnconfigure(0, weight=1)
-        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
 
         self.level = level
 
@@ -44,8 +46,11 @@ class LevelPlayer(ttk.Frame):
         for line in self.level.direction_layout.splitlines():
             logger.debug("'%s'", line)
 
-        self.level_view = LevelView(self, level)
-        self.level_view.grid(column=0, row=0, sticky=ttkc.NSEW)
+        self.level_top_bar = LevelTopBar(self, level.name, None)  # TODO: Get save token count.
+        self.level_top_bar.grid(column=0, row=0, sticky=ttkc.NSEW)
 
-        self.level_bar = LevelBar(self)
-        self.level_bar.grid(column=0, row=1, sticky=ttkc.NSEW)
+        self.level_view = LevelView(self, level.get_tile_data_matrix())
+        self.level_view.grid(column=0, row=1, sticky=ttkc.NSEW)
+
+        self.level_bottom_bar = LevelBottomBar(self)
+        self.level_bottom_bar.grid(column=0, row=2, sticky=ttkc.NSEW)

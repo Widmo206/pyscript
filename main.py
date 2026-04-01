@@ -28,4 +28,3 @@ if __name__ == "__main__":
     App().run()
 
 # TODO: Replace all logging f-strings with % formatting. (source: Kessler said it was a bit faster)
-# TODO: Rework dataclass parsing with dacite or smth.

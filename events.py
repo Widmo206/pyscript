@@ -140,11 +140,6 @@ class RedoRequested(Event):
 
 
 @dataclass(frozen=True, slots=True)
-class RestartButtonPressed(Event):
-    pass
-
-
-@dataclass(frozen=True, slots=True)
 class RestartRequested(Event):
     pass
 
@@ -160,17 +155,7 @@ class RunRequested(Event):
 
 
 @dataclass(frozen=True, slots=True)
-class StepBackButtonPressed(Event):
-    pass
-
-
-@dataclass(frozen=True, slots=True)
 class StepBackRequested(Event):
-    pass
-
-
-@dataclass(frozen=True, slots=True)
-class StepForwardButtonPressed(Event):
     pass
 
 

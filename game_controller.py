@@ -22,12 +22,14 @@ class GameController:
         self.cycle_controller = CycleController(scheduler)
         self.level_model = LevelModel.from_path(path)
 
+        events.Cycled.connect(self._on_cycled)
         events.RestartRequested.connect(self._on_restart_requested)
         events.RunRequested.connect(self._on_run_requested)
         events.StepBackRequested.connect(self._on_step_back_requested)
         events.StepForwardRequested.connect(self._on_step_forward_requested)
 
     def destroy(self) -> None:
+        events.Cycled.disconnect(self._on_cycled)
         events.RestartRequested.disconnect(self._on_restart_requested)
         events.RunRequested.disconnect(self._on_run_requested)
         events.StepBackRequested.disconnect(self._on_step_back_requested)

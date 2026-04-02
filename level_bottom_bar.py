@@ -40,7 +40,7 @@ class LevelBottomBar(ttk.Frame):
         self.restart_image_tk = ImageTk.PhotoImage(Image.open(Path("sprites/restart.png")))
         self.restart_button = ttk.Button(
             self,
-            command=events.RestartButtonPressed,
+            command=events.RestartRequested,
             image=self.restart_image_tk,
             bootstyle=kwargs["bootstyle"],
         )
@@ -49,7 +49,7 @@ class LevelBottomBar(ttk.Frame):
         self.step_back_image_tk = ImageTk.PhotoImage(Image.open(Path("sprites/step_back.png")))
         self.step_back_button = ttk.Button(
             self,
-            command=events.StepBackButtonPressed,
+            command=events.StepBackRequested,
             image=self.step_back_image_tk,
             bootstyle=kwargs["bootstyle"],
         )
@@ -68,7 +68,7 @@ class LevelBottomBar(ttk.Frame):
         self.step_forward_image_tk = ImageTk.PhotoImage(Image.open(Path("sprites/step_forward.png")))
         self.step_forward_button = ttk.Button(
             self,
-            command=events.StepForwardButtonPressed,
+            command=events.StepForwardRequested,
             image=self.step_forward_image_tk,
             bootstyle=kwargs["bootstyle"],
         )

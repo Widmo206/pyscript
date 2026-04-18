@@ -106,7 +106,8 @@ class LevelClosed(Event):
 
 @dataclass(frozen=True, slots=True)
 class LevelComplete(Event):
-    pass
+    level: Level
+    step_count: int
 
 
 @dataclass(frozen=True, slots=True)

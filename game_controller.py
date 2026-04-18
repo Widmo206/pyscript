@@ -23,6 +23,7 @@ class GameController:
         self.level_model = LevelModel.from_path(path)
 
         events.Cycled.connect(self._on_cycled)
+        events.LevelComplete.connect(self._on_level_complete)
         events.RestartRequested.connect(self._on_restart_requested)
         events.RunRequested.connect(self._on_run_requested)
         events.StepBackRequested.connect(self._on_step_back_requested)
@@ -38,8 +39,13 @@ class GameController:
     def _on_cycled(self, _event: events.Cycled) -> None:
         self.level_model.step_forward()
 
+    def _on_level_complete(self, _event: events.LevelComplete) -> None:
+        if self.cycle_controller.is_running:
+            self.cycle_controller.stop()
+
     def _on_restart_requested(self, _event: events.RestartRequested) -> None:
-        self.cycle_controller.stop()
+        if self.cycle_controller.is_running:
+            self.cycle_controller.stop()
         self.level_model.restart()
 
     def _on_run_requested(self, event: events.RunRequested) -> None:
@@ -52,9 +58,11 @@ class GameController:
             self.cycle_controller.start()
 
     def _on_step_back_requested(self, _event: events.StepBackRequested) -> None:
-        self.cycle_controller.stop()
+        if self.cycle_controller.is_running:
+            self.cycle_controller.stop()
         self.level_model.step_back()
 
     def _on_step_forward_requested(self, _event: events.StepForwardRequested) -> None:
-        self.cycle_controller.stop()
+        if self.cycle_controller.is_running:
+            self.cycle_controller.stop()
         self.level_model.step_forward()

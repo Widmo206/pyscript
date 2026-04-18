@@ -25,9 +25,6 @@ class CycleController:
         self._cycle()
 
     def stop(self) -> None:
-        if not self.is_running:
-            return
-
         self.scheduler.after_cancel(self.after_id)
         self.is_running = False
         self.after_id = None

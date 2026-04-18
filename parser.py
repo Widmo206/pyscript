@@ -7,6 +7,7 @@ Contributors:
 
 # TODO: Please refactor into one file per class.
 
+from __future__ import annotations
 from dataclasses import dataclass
 import logging
 from string import ascii_letters, digits, whitespace
@@ -177,22 +178,22 @@ class ProcessNode(object):
 
     def get_parent(self) -> ProcessNode | None:
         return self._parent
-    
+
     def has_children(self):
         return self._children is None
-    
+
     def get_children(self) -> tuple[ProcessNode, ...]:
         if self._children is None:
             return tuple()
         else:
             return self._children
-    
+
     def add_child(self, node: ProcessNode):
         if self._children is None:
             self._children = (node,)
         else:
             self._children += (node,)
-    
+
 
 @dataclass
 class ProcessTree(object):
@@ -200,7 +201,7 @@ class ProcessTree(object):
 
     def __init__(self):
         self._root = ProcessNode(None, NodeType.CLOSURE, None, None)
-    
+
     def get_root(self):
         return self._root
 

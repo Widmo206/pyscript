@@ -119,6 +119,12 @@ class LevelModel:
             self.set_tile_model(x, y, deepcopy(tile_model))
 
     def step_forward(self) -> None:
+        # TODO: Add events for base state and win state, to toggle editor and step buttons.
+        # Early check looks redundant but is necessary to avoid stepping when level is already complete.
+        if self.check_win_state():
+            events.LevelComplete(self.level, len(self.history))
+            return
+
         self.history.append(deepcopy(self.tile_model_matrix))
 
         tile_data_matrix = self.tile_model_matrix.map(
@@ -140,7 +146,7 @@ class LevelModel:
             self.process_tile_action(x, y, action)
 
         if self.check_win_state():
-            events.LevelComplete()
+            events.LevelComplete(self.level, len(self.history))
 
     def tile_config(
         self,

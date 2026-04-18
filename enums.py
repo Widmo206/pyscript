@@ -173,7 +173,7 @@ class TokenType(Enum):
 
 
 class NodeType(Enum):
-    "Used by Parser to organize a list of tokens into a ProcessTree."
+    """Used by Parser to organize a list of tokens into a ProcessTree."""
     CLOSURE   = auto()
     READ      = auto()
     WRITE     = auto()

@@ -90,7 +90,7 @@ class LevelModel:
                 pass
 
             case _:
-                pass
+                logger.error("Unknown tile action %s", action)
 
     def restart(self) -> None:
         if len(self.history) == 0:

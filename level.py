@@ -14,7 +14,7 @@ import dacite
 import yaml
 from yaml.parser import ParserError
 
-from common import message_error, normalize_path
+from common import message_error
 from matrix import Matrix
 from tile_data import TileData
 

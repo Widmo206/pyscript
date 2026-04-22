@@ -38,18 +38,17 @@ class TileModel:
     ) -> TileAction | None:
         if self.processor is not None:
             # TODO: Remove manual movement.
-            while True:
-                match askstring("Player movement", "Player movement (wasd): "):
-                    case "w":
-                        return TileAction.MOVE_FORWARD
-                    case "s":
-                        return TileAction.MOVE_BACK
-                    case "a":
-                        return TileAction.TURN_LEFT
-                    case "d":
-                        return TileAction.TURN_RIGHT
-                    case _:
-                        events.RunRequested(None)
+            match askstring("Player movement", "Player movement (wasd): "):
+                case "w":
+                    return TileAction.MOVE_FORWARD
+                case "s":
+                    return TileAction.MOVE_BACK
+                case "a":
+                    return TileAction.TURN_LEFT
+                case "d":
+                    return TileAction.TURN_RIGHT
+                case _:
+                    events.RunRequested(None)
             # return self.processor.advance(self_x, self_y, tile_data_matrix)
 
         # If no pyscript processor, match behavior to tile type.
